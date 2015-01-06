@@ -149,7 +149,7 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message or if the action is denied.</exception>
         /// <returns>
-        /// A bool indicating if the call was successful or not.
+        /// A bool indicating if the call was successfull or not.
         /// </returns>
         public bool UpdatePackageLife(String packageId, int life)
         {
@@ -185,7 +185,6 @@ namespace SendSafely
         {
             EnforceInitialized();
 
-            Logger.Log("Encrypting to packageID: " + packageId);
             String keyCode;
             try
             {

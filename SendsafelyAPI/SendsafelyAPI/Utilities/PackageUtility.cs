@@ -11,7 +11,7 @@ namespace SendSafely
     internal class PackageUtility
     {
         private Connection connection;
-        private long SEGMENT_SIZE = 10485760; // 10 MB
+        private long SEGMENT_SIZE = 5242880; // 5 MB
 
         #region Constructors
         
