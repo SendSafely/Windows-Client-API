@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using SendSafely.Objects;
@@ -50,6 +50,22 @@ namespace SendSafely
             return packageInfo;
         }
 
+        public List<String> GetActivePackages()
+        {
+            Endpoint p = ConnectionStrings.Endpoints["activePackages"].Clone();
+            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+
+            return response.Packages;
+        }
+
+        public List<String> GetArchivedPackages()
+        {
+            Endpoint p = ConnectionStrings.Endpoints["archivedPackages"].Clone();
+            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+
+            return response.Packages;
+        }
+
         public PackageInformation GetPackageInformation(String packageId)
         {
             Endpoint p = ConnectionStrings.Endpoints["packageInformation"].Clone();
@@ -63,10 +79,18 @@ namespace SendSafely
             packageInfo.Approvers = response.Approvers;
 
             packageInfo.Files = response.Files;
+            
             packageInfo.NeedsApprover = response.NeedsApprover;
             packageInfo.Recipients = response.Recipients;
             packageInfo.Life = response.Life;
-            packageInfo.KeyCode = connection.GetKeycode(packageId);
+            try
+            {
+                packageInfo.KeyCode = connection.GetKeycode(packageId);
+            }
+            catch (InvalidPackageException)
+            {
+                packageInfo.KeyCode = null;
+            }
 
             return packageInfo;
         }
@@ -326,6 +350,19 @@ namespace SendSafely
         public void DeleteTempPackage(String packageId)
         {
             Endpoint p = ConnectionStrings.Endpoints["deleteTempPackage"].Clone();
+            p.Path = p.Path.Replace("{packageId}", packageId);
+
+            StandardResponse response = connection.Send<StandardResponse>(p);
+
+            if (response.Response != APIResponse.SUCCESS)
+            {
+                throw new ActionFailedException(response.Response.ToString(), response.Message);
+            }
+        }
+
+        public void DeletePackage(String packageId)
+        {
+            Endpoint p = ConnectionStrings.Endpoints["deletePackage"].Clone();
             p.Path = p.Path.Replace("{packageId}", packageId);
 
             StandardResponse response = connection.Send<StandardResponse>(p);

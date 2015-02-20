@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +15,7 @@ namespace SendSafely
         private bool needsApproval;
         private List<String> approvers;
         private List<PhoneNumber> phonenumbers;
+        private List<Confirmation> confirmations;
 
         /// <summary>
         /// The recipient ID. Each recipient is given a unique ID once it's added. 
@@ -46,16 +47,32 @@ namespace SendSafely
             set { needsApproval = value; }
         }
 
+        /// <summary>
+        /// A list of all possible approvers for the given recipient.
+        /// </summary>
         public List<String> Approvers
         {
             get { return approvers; }
             set { approvers = value; }
         }
 
+        /// <summary>
+        /// A list of all phonenumbers that was used for this recipient in the past.
+        /// </summary>
         public List<PhoneNumber> PhoneNumbers
         {
             get { return phonenumbers; }
             set { phonenumbers = value; }
+        }
+
+        /// <summary>
+        /// A list of all confirmations for the recipient. A confirmation will be added as soon as 
+        /// a recipient has downloaded one or more files from the item.
+        /// </summary>
+        public List<Confirmation> Confirmations
+        {
+            get { return confirmations; }
+            set { confirmations = value; }
         }
     }
 }

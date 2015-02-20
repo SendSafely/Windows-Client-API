@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using SendSafely.Objects;
@@ -113,6 +113,42 @@ namespace SendSafely
 
             PackageUtility pu = new PackageUtility(connection);
             return pu.CreatePackage();
+        }
+
+        /// <summary>
+        /// Retrieves a list of all active packages for the given API Key.</summary>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// A List containing package IDs for all active packages.
+        /// </returns>
+        public List<String> GetActivePackages()
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetActivePackages();
+        }
+
+        /// <summary>
+        /// Retrieves a list of all active packages for the given API Key.</summary>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// A List containing package IDs for all archived packages.
+        /// </returns>
+        public List<String> GetArchivedPackages()
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetArchivedPackages();
         }
 
         /// <summary>
@@ -385,6 +421,23 @@ namespace SendSafely
 
             PackageUtility pu = new PackageUtility(connection);
             pu.DeleteTempPackage(packageId);
+        }
+
+        /// <summary>
+        /// Deletes a package. Before this function can be called, the package must have been created with 
+        /// <seealso cref="CreatePackage()">CreatePackage()</seealso>.</summary>
+        /// <param name="packageId"> The packageID referencing the object which should be deleted.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        public void DeletePackage(String packageId)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            pu.DeletePackage(packageId);
         }
 
         private void EnforceInitialized()
