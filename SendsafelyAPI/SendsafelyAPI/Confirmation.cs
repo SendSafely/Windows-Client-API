@@ -12,6 +12,7 @@ namespace SendSafely
         private String ipAddress;
         private DateTime timestamp;
         private File file;
+        private Boolean _isMessage;
 
         /// <summary>
         /// The IP Address from where the file was downloaded.
@@ -38,6 +39,15 @@ namespace SendSafely
         {
             get { return file; }
             set { file = value; }
+        }
+
+        /// <summary>
+        /// A flag indicating if the confirmation is for a message. If it is, the File object will be null
+        /// </summary>
+        public bool isMessage
+        {
+            get { return _isMessage; }
+            set { _isMessage = value; }
         }
     }
 }
