@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Confirmation.cs" />
     <Compile Include="File.cs" />
     <Compile Include="CountryCodes.cs" />
     <Compile Include="EnterpriseInformation.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Exceptions\InvalidCredentialsException.cs" />
     <Compile Include="Objects\AddMessageRequest.cs" />
     <Compile Include="Objects\CreateFileIdRequest.cs" />
+    <Compile Include="Objects\GetPackagesResponse.cs" />
     <Compile Include="Objects\UpdatePackageRequest.cs" />
     <Compile Include="Objects\EnterpriseInformationResponse.cs" />
     <Compile Include="Objects\FinalizePackageRequest.cs" />
