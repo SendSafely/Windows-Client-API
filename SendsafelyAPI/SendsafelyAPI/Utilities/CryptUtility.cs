@@ -12,6 +12,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
+using SendSafely.Exceptions;
 
 namespace SendSafely.Utilities
 {
@@ -37,6 +38,106 @@ namespace SendSafely.Utilities
                     WriteFileToLiteralData(cOut, PgpLiteralData.Binary, inputFile, filename, inputFile.Length);
                 }
             }
+        }
+
+        public void DecryptFile(Stream outStream, Stream inputStream, char[] passPhrase)
+        {
+            inputStream = PgpUtilities.GetDecoderStream(inputStream);
+
+            PgpObjectFactory pgpF = new PgpObjectFactory(inputStream);
+            PgpEncryptedDataList enc = null;
+            PgpObject o = pgpF.NextPgpObject();
+
+            //
+            // the first object might be a PGP marker packet.
+            //
+            if (o is PgpEncryptedDataList)
+            {
+                enc = (PgpEncryptedDataList)o;
+            }
+            else
+            {
+                enc = (PgpEncryptedDataList)pgpF.NextPgpObject();
+            }
+
+            PgpPbeEncryptedData pbe = (PgpPbeEncryptedData)enc[0];
+
+            Stream clear = pbe.GetDataStream(passPhrase);
+
+            PgpObjectFactory pgpFact = new PgpObjectFactory(clear);
+
+            PgpLiteralData ld = (PgpLiteralData)pgpFact.NextPgpObject();
+
+            Stream unc = ld.GetInputStream();
+
+            byte[] buf = new byte[1 << 16];
+            int len;
+            while ((len = unc.Read(buf, 0, buf.Length)) > 0)
+            {
+                outStream.Write(buf, 0, len);
+            }
+
+            // Finally verify the integrity
+            if (pbe.IsIntegrityProtected())
+            {
+                if (!pbe.Verify())
+                {
+                    throw new MessageVerificationException("Failed to verify the message. It might have been modified in transit.");
+                }
+            }
+        }
+
+        public String DecryptMessage(String encryptedMessage, char[] passPhrase)
+        {
+            // Remove the Base64 encoding
+            byte[] rawMessage = Convert.FromBase64String(encryptedMessage);
+
+            Stream inputStream = new MemoryStream(rawMessage);
+
+            inputStream = PgpUtilities.GetDecoderStream(inputStream);
+
+            PgpObjectFactory pgpF = new PgpObjectFactory(inputStream);
+            PgpEncryptedDataList enc = null;
+            PgpObject o = pgpF.NextPgpObject();
+
+            //
+            // the first object might be a PGP marker packet.
+            //
+            if (o is PgpEncryptedDataList)
+            {
+                enc = (PgpEncryptedDataList)o;
+            }
+            else
+            {
+                enc = (PgpEncryptedDataList)pgpF.NextPgpObject();
+            }
+
+            PgpPbeEncryptedData pbe = (PgpPbeEncryptedData)enc[0];
+
+            Stream clear = pbe.GetDataStream(passPhrase);
+
+            PgpObjectFactory pgpFact = new PgpObjectFactory(clear);
+
+            PgpLiteralData ld = (PgpLiteralData)pgpFact.NextPgpObject();
+
+            Stream unc = ld.GetInputStream();
+
+            String message;
+            using (StreamReader reader = new StreamReader(unc, Encoding.UTF8))
+            {
+                message = reader.ReadToEnd();
+            }
+
+            // Finally verify the integrity
+            if (pbe.IsIntegrityProtected())
+            {
+                if (!pbe.Verify())
+                {
+                    throw new MessageVerificationException("Failed to verify the message. It might have been modified in transit.");
+                }
+            } 
+
+            return message;
         }
 
         public String EncryptMessage(String unencryptedMessage, char[] passPhrase)

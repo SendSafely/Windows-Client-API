@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ namespace SendSafely.Objects
     class GetPackagesResponse
     {
         private APIResponse _response;
-        private List<String> _packages;
+        private List<PackageDTO> _packages;
 
         [JsonProperty(PropertyName = "response")]
         internal APIResponse Response
@@ -19,7 +19,7 @@ namespace SendSafely.Objects
         }
 
         [JsonProperty(PropertyName = "packages")]
-        public List<String> Packages
+        public List<PackageDTO> Packages
         {
             get { return _packages; }
             set { _packages = value; }

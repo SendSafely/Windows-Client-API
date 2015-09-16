@@ -25,7 +25,7 @@ namespace SendSafely.Objects
         private String outlookVersion = null;
 
         #region Constructors
-        
+
         public Connection(String host, String privateKey, String apiKey)
         {
             Initialize(host, privateKey, apiKey);
@@ -36,7 +36,13 @@ namespace SendSafely.Objects
             Initialize(host, privateKey, apiKey);
             this.proxy = proxy;
         }
-        
+
+        public Connection(String host, WebProxy proxy)
+        {
+            Initialize(host, null, null);
+            this.proxy = proxy;
+        }
+
         #endregion
 
         #region Public Functions
@@ -112,7 +118,7 @@ namespace SendSafely.Objects
         public HttpWebRequest GetRequestforFileUpload(Endpoint p, String boundary, String fileId, UploadFileRequest requestData)
         {
             String url = this.url + p.Path;
-            
+
             HttpWebRequest wrReq;
             wrReq = (HttpWebRequest)WebRequest.Create(url);
             wrReq.Timeout = Timeout.Infinite;
@@ -128,17 +134,7 @@ namespace SendSafely.Objects
             wrReq.Method = p.Method.ToString();
             wrReq.ContentType = p.ContentType + "; boundary=" + boundary;
 
-            // We will implement our own UserAgent.
-            String userAgent = "Custom (" + Environment.OSVersion.ToString() + ")";
-            if (outlookVersion != null)
-            {
-                userAgent += " Outlook Version " + outlookVersion;
-            }
-            else
-            {
-                userAgent += ".NET API";
-            }
-            //wrReq.Headers.Add("test-header", userAgent);
+            String userAgent = generateUserAgent();
             wrReq.UserAgent = userAgent;
 
             if (proxy != null)
@@ -147,6 +143,53 @@ namespace SendSafely.Objects
             }
 
             return wrReq;
+        }
+
+        public Stream CallServer(Endpoint p, Object request)
+        {
+            String url = this.url + p.Path;
+            HttpWebRequest wrReq;
+            wrReq = (HttpWebRequest)WebRequest.Create(url);
+            wrReq.Timeout = Timeout.Infinite;
+
+            if (apiKey != null)
+            {
+                wrReq.Headers.Add(apiKeyHeadervalue, apiKey);
+            }
+            wrReq.Method = p.Method.ToString();
+
+            wrReq.UserAgent = generateUserAgent();
+
+            String requestString = "";
+            if (request != null)
+            {
+                requestString = ConvertToJSON(request);
+            }
+
+            DateTime now = DateTime.UtcNow;
+            String dateStr = now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss") + "+0000";
+
+            if (apiKey != null && privateKey != null)
+            {
+                String signature = CreateSignature(privateKey, apiKey, p.Path, dateStr, requestString);
+                wrReq.Headers.Add(apiSignatureHeadervalue, signature);
+            }
+            wrReq.Headers.Add(apiTimestampHeadervalue, dateStr);
+
+            if (proxy != null)
+            {
+                wrReq.Proxy = proxy;
+            }
+
+            wrReq.ContentType = p.ContentType;
+            if (request != null)
+            {
+                WriteOutput(wrReq, requestString);
+            }
+
+            Stream objStream;
+            objStream = wrReq.GetResponse().GetResponseStream();
+            return objStream;
         }
 
         #endregion
@@ -166,51 +209,7 @@ namespace SendSafely.Objects
 
         private String SendRequest(Endpoint p, Object request)
         {
-            String url = this.url + p.Path;
-            HttpWebRequest wrReq;
-            wrReq = (HttpWebRequest)WebRequest.Create(url);
-            wrReq.Timeout = Timeout.Infinite;
-            wrReq.Headers.Add(apiKeyHeadervalue, apiKey);
-            wrReq.Method = p.Method.ToString();
-
-            // We will implement our own UserAgent.
-            String userAgent = "Custom (" + Environment.OSVersion.ToString() + ")";
-            if (outlookVersion != null)
-            {
-                userAgent += " Outlook Version " + outlookVersion;
-            }
-            else
-            {
-                userAgent += ".NET API";
-            }
-            wrReq.UserAgent = userAgent;
-
-            String requestString = "";
-            if (request != null)
-            {
-                requestString = ConvertToJSON(request);
-            }
-
-            DateTime now = DateTime.UtcNow;
-            String dateStr = now.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss") + "+0000";
-            String signature = CreateSignature(privateKey, apiKey, p.Path, dateStr, requestString);
-
-            wrReq.Headers.Add(apiSignatureHeadervalue, signature);
-            wrReq.Headers.Add(apiTimestampHeadervalue, dateStr);
-
-            if (proxy != null)
-            {
-                wrReq.Proxy = proxy;
-            }
-
-            wrReq.ContentType = p.ContentType;
-            if (request != null)
-            {
-                WriteOutput(wrReq, requestString);
-            }
-
-            Stream objStream;
-            objStream = wrReq.GetResponse().GetResponseStream();
+            Stream objStream = CallServer(p, request);
 
             StreamReader objReader = new StreamReader(objStream);
 
@@ -227,6 +226,21 @@ namespace SendSafely.Objects
             }
 
             return response;
+        }
+
+        private String generateUserAgent()
+        {
+            String userAgent = "Custom (" + Environment.OSVersion.ToString() + ")";
+            if (outlookVersion != null)
+            {
+                userAgent += " Outlook Version " + outlookVersion;
+            }
+            else
+            {
+                userAgent += ".NET API";
+            }
+
+            return userAgent;
         }
 
         private String CreateSignature(String privateKey, String apiKey, String uri, String dateStr, String requestData)
@@ -246,7 +260,7 @@ namespace SendSafely.Objects
         {
             // Serialize the object
             byte[] reqData = System.Text.Encoding.UTF8.GetBytes(requestString);
-            
+
             req.ContentLength = reqData.Length;
             Stream dataStream = req.GetRequestStream();
             dataStream.Write(reqData, 0, reqData.Length);

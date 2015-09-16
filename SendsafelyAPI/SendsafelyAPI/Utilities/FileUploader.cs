@@ -106,17 +106,22 @@ namespace SendSafely.Utilities
 
             this.response = JsonConvert.DeserializeObject<StandardResponse>(responseStr);
 
-            if (response.Response == APIResponse.AUTHENTICATION_FAILED)
+            if (this.response == null)
             {
-                throw new InvalidCredentialsException(response.Message);
+                throw new ActionFailedException("NULL_RESPONSE", "The server response could not be parsed");
             }
-            else if (response.Response == APIResponse.UNKNOWN_PACKAGE)
+
+            if (this.response.Response == APIResponse.AUTHENTICATION_FAILED)
+            {
+                throw new InvalidCredentialsException(this.response.Message);
+            }
+            else if (this.response.Response == APIResponse.UNKNOWN_PACKAGE)
             {
                 throw new InvalidPackageException(response.Message);
             }
-            else if (response.Response == APIResponse.INVALID_EMAIL)
+            else if (this.response.Response == APIResponse.INVALID_EMAIL)
             {
-                throw new InvalidEmailException(response.Message);
+                throw new InvalidEmailException(this.response.Message);
             }
 
             return uploadedBytes;

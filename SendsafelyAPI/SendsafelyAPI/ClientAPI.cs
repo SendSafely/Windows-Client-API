@@ -5,6 +5,7 @@ using SendSafely.Objects;
 using SendSafely.Utilities;
 using SendSafely.Exceptions;
 using System.Net;
+using System.IO;
 
 namespace SendSafely
 {
@@ -37,6 +38,125 @@ namespace SendSafely
         {
             StartupUtility su = new StartupUtility(host, apiSecret, apiKey, proxy);
             this.connection = su.GetConnectionObject();
+        }
+
+        public void InitialSetup(string host, WebProxy proxy)
+        {
+            this.connection = new Connection(host, proxy);
+        }
+
+        public void InitialSetup(string host)
+        {
+            InitialSetup(host, (WebProxy)null);
+        }
+
+        /// <summary>
+        /// Starts the registration process. If a valid email is provided, a validation code will be sent to the SendSafely servers.
+        /// </summary>
+        /// <param name="email">The email to register</param>
+        /// <exception cref="InvalidEmailException">Thrown when an incorrect email is used.</exception>
+        /// <exception cref="ActionFailedException">Thrown when the request failed for any other reason.</exception>
+        public void StartRegistration(String email)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            util.StartRegistration(email);
+        }
+
+        /// <summary>
+        /// Starts the registration process. If a valid email is provided, a validation code will be sent to the SendSafely servers.
+        /// </summary>
+        /// <param name="email">The email to register</param>
+        /// <exception cref="InvalidEmailException">Thrown when an incorrect email is used.</exception>
+        /// <exception cref="RegistrationNotAllowedException">Thrown when the user is not allowed to register</exception>
+        /// <exception cref="ActionFailedException">Thrown when the request failed for any other reason.</exception>
+        public void StartPINRegistration(String email)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            util.StartPINRegistration(email);
+        }
+
+        /// <summary>
+        /// Finishes the registration process. Before this can be called a valid token must have been obtained.
+        /// </summary>
+        /// <param name="validationLink">The validation link which was sent to the specified email address</param>
+        /// <param name="password">The desired password</param>
+        /// <param name="secretQuestion">The secret question which is to be associated with the account</param>
+        /// <param name="answer">The answer answering the secret question</param>
+        /// <param name="firstName">The First name of the user</param>
+        /// <param name="lastName">The last name of the user</param>
+        /// <param name="keyDescription">A description describing the generated API key</param>
+        /// <exception cref="InsufficientPasswordComplexityException">Thrown when the password is to simple</exception>
+        /// <exception cref="TokenExpiredException">Thrown when the passed in token has expired</exception>
+        /// <exception cref="InvalidTokenException">Thrown when passed in token is incorrect</exception>
+        public APICredential FinishRegistration(String validationLink, String password, String secretQuestion, String answer, String firstName, String lastName, String keyDescription)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            return util.FinishRegistration(validationLink, password, secretQuestion, answer, firstName, lastName, keyDescription);
+        }
+
+        /// <summary>
+        /// Finishes the registration process. Before this can be called a valid oauth token must have been obtained.
+        /// </summary>
+        /// <param name="oauthToken">The Google oauth token used to look up the user</param>
+        /// <param name="keyDescription">A description describing the generated API key</param>
+        /// <exception cref="RegistrationNotAllowedException">Thrown when the user is not allowed to register</exception>
+        /// <exception cref="DuplicateUserException">Thrown when the user already has a valid username/password account</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the oauth token is incorrect</exception>
+        public APICredential OAuthGenerateAPIKey(String oauthToken, String keyDescription)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            return util.OAuthGenerateAPIKey(oauthToken, keyDescription);
+        }
+
+        /// <summary>
+        /// Finishes the registration process. Before this can be called a pin code must have been obtained.
+        /// </summary>
+        /// <param name="email">The email to the user to finish registration for</param>
+        /// <param name="pincode">The pincode sent to the users email</param>
+        /// <param name="password">The desired password</param>
+        /// <param name="secretQuestion">The secret question which is to be associated with the account</param>
+        /// <param name="answer">The answer answering the secret question</param>
+        /// <param name="firstName">The First name of the user</param>
+        /// <param name="lastName">The last name of the user</param>
+        /// <param name="keyDescription">A description describing the generated API key</param>
+        /// <exception cref="InsufficientPasswordComplexityException">Thrown when the password is to simple</exception>
+        /// <exception cref="TokenExpiredException">Thrown when the passed in token has expired</exception>
+        /// <exception cref="PINRefreshException">Thrown when a new Email PIN has been sent to the user</exception>
+        /// <exception cref="InvalidTokenException">Thrown when passed in token is incorrect</exception>
+        public APICredential FinishPINRegistration(String email, String pincode, String password, String secretQuestion, String answer, String firstName, String lastName, String keyDescription)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            return util.FinishPINRegistration(email, pincode, password, secretQuestion, answer, firstName, lastName, keyDescription);
+        }
+
+        /// <summary>
+        /// Generate a new API Key given a username and password.
+        /// </summary>
+        /// <param name="username">The email address of the given user.</param>
+        /// <param name="password">The password belonging to the user</param>
+        /// <param name="keyDescription">A description describing the generated API key</param>
+        /// <exception cref="TwoFactorAuthException">Thrown when two factor authentication is required. The exception contains a ValidationToken that must be used in the subsequent request</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the username/password combination is wrong.</exception>
+        /// <exception cref="ActionFailedException">Thrown if any other error occurs</exception>
+        public APICredential GenerateAPIKey(String username, String password, String keyDescription)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            return util.GenerateAPIKey(username, password, keyDescription);
+        }
+
+        /// <summary>
+        /// Generate a new API Key given a validation token and a SMS Code.
+        /// </summary>
+        /// <param name="validationLink">The validation link associated with the user.</param>
+        /// <param name="smsCode">The smsCode sent to the users phone</param>
+        /// <param name="keyDescription">A description describing the generated API key</param>
+        /// <exception cref="InvalidCredentialsException">Thrown if the SMS Code is incorrect</exception>
+        /// <exception cref="PINRefreshException">Thrown if there's been to many failed attempts and a new SMS code is needed</exception>
+        /// <exception cref="ActionFailedException">Thrown if any other error occured</exception>
+        public APICredential GenerateKey2FA(String validationLink, String smsCode, String keyDescription)
+        {
+            RegistrationUtility util = new RegistrationUtility(connection);
+            return util.GenerateAPIKey2FA(validationLink, smsCode, keyDescription);
         }
 
         public void SetOutlookVersion(String version)
@@ -78,6 +198,18 @@ namespace SendSafely
             StartupUtility su = new StartupUtility(connection);
             String email = su.VerifyCredentials();
             return email;
+        }
+
+        /// <summary>
+        /// Parses out SendSafely links from a String of text.
+        /// </summary>
+        /// <returns>
+        /// Returns a list of SendSafely links found in the text String.
+        /// </returns>
+        public List<String> ParseLinksFromText(String text)
+        {
+            ParseLinksUtility handler = new ParseLinksUtility();
+            return handler.Parse(text);
         }
 
         /// <summary>
@@ -123,9 +255,9 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
         /// <returns>
-        /// A List containing package IDs for all active packages.
+        /// A List containing package metadata for all active packages.
         /// </returns>
-        public List<String> GetActivePackages()
+        public List<PackageInformation> GetActivePackages()
         {
             EnforceInitialized();
 
@@ -141,9 +273,9 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
         /// <returns>
-        /// A List containing package IDs for all archived packages.
+        /// A List containing package metadata for all archived packages.
         /// </returns>
-        public List<String> GetArchivedPackages()
+        public List<PackageInformation> GetArchivedPackages()
         {
             EnforceInitialized();
 
@@ -174,6 +306,54 @@ namespace SendSafely
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetPackageInformation(packageId);
         }
+
+    /// <summary>
+    /// Retrieves the information for the current package given a SendSafely link.</summary>
+    /// <param name="link">The link identiying the package.</param>
+    /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+    /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+    /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid link is used.</exception>
+    /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+    /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+    /// <returns>
+    /// A PackageInfo object containing information about the package.
+    /// </returns>
+	public PackageInformation GetPackageInformationFromLink(String link)
+	{
+        EnforceInitialized();
+
+        if (link == null)
+        {
+            throw new InvalidPackageException("The supplied link is null");
+        }
+
+        PackageUtility pu = new PackageUtility(connection);
+        return pu.GetPackageInformationFromLink(link);
+	}
+	
+	/// <summary>
+    /// Retrieves the information for the current package given a SendSafely link.</summary>
+    /// <param name="packageId">The link identiying the package.</param>
+    /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+    /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+    /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid link ID is used.</exception>
+    /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+    /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+    /// <returns>
+    /// A PackageInfo object containing information about the package.
+    /// </returns>
+    public PackageInformation getPackageInformationFromLink(Uri link)
+	{
+        EnforceInitialized();
+
+        if (link == null)
+        {
+            throw new InvalidPackageException("The supplied link is null");
+        }
+
+        PackageUtility pu = new PackageUtility(connection);
+        return pu.GetPackageInformationFromLink(link);
+	}
 
         /// <summary>
         /// Retrieves the information for the current package.</summary>
@@ -334,6 +514,76 @@ namespace SendSafely
             PackageUtility pu = new PackageUtility(connection);
 
             pu.EncryptAndUploadMessage(packageId, keyCode, message, uploadType);
+        }
+
+        /// <summary>
+        /// Downloads and decrypts a message for the given secure link
+        /// <seealso cref="CreatePackage()">createPackage()</seealso>.</summary>
+        /// <param name="secureLink">The link from where to download the message</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+        /// <exception cref="MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// Returns the decrypted message
+        /// </returns>
+        public String GetMessage(String secureLink)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetMessage(secureLink);
+        }
+
+        /// <summary>
+        /// Downloads and decrypts a file given a package and a file ID
+        /// </summary>
+        /// <param name="packageId">The Package Identifier to grab the file from</param>
+        /// <param name="fileId">The file to download</param>
+        /// <param name="keyCode">The key which will be used to decrypt the file with.</param>
+        /// <param name="progress">A progress object to where progress will be called back to.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+        /// <exception cref="MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// Returns the decrypted file
+        /// </returns>
+        public FileInfo DownloadFile(String packageId, String fileId, String keyCode, ISendSafelyProgress progress)
+	    {
+            return DownloadFile(packageId, fileId, keyCode, progress, "CSHARP");
+	    }
+
+        /// <summary>
+        /// Downloads and decrypts a file given a package and a file ID
+        /// </summary>
+        /// <param name="packageId">The Package Identifier to grab the file from</param>
+        /// <param name="fileId">The file to download</param>
+        /// <param name="keyCode">The key which will be used to decrypt the file with.</param>
+        /// <param name="progress">A progress object to where progress will be called back to.</param>
+        /// <param name="downloadAPI">A String identifying the API which is downloading the file. Defaults to "CSHARP".</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+        /// <exception cref="MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// Returns the decrypted file
+        /// </returns>
+        public FileInfo DownloadFile(String packageId, String fileId, String keyCode, ISendSafelyProgress progress, String downloadAPI)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.DownloadFile(packageId, fileId, keyCode, progress, downloadAPI);
         }
 
         /// <summary>

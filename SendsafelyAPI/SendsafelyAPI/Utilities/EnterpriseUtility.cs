@@ -29,6 +29,8 @@ namespace SendSafely.Utilities
             EnterpriseInformation info = new EnterpriseInformation();
             info.Host = response.Host;
             info.SystemName = response.SystemName;
+            info.AllowUndisclosedRecipients = response.AllowUndisclosedRecipients;
+            info.OutlookBeta = response.OutlookBeta;
 
             return info;
         }

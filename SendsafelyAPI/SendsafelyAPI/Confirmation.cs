@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +12,7 @@ namespace SendSafely
         private String ipAddress;
         private DateTime timestamp;
         private File file;
-        private Boolean _isMessage;
+        private bool _isMessage;
 
         /// <summary>
         /// The IP Address from where the file was downloaded.

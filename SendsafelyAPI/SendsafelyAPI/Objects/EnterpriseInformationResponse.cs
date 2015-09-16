@@ -11,6 +11,8 @@ namespace SendSafely.Objects
 
         private String _host;
         private String _systemName;
+        private bool _allowUndisclosedRecipients;
+        private bool _outlookBeta;
 
         [JsonProperty(PropertyName = "host")]
         public String Host
@@ -26,5 +28,18 @@ namespace SendSafely.Objects
             set { _systemName = value; }
         }
 
+        [JsonProperty(PropertyName = "allowUndisclosedRecipients")]
+        public bool AllowUndisclosedRecipients
+        {
+            get { return _allowUndisclosedRecipients; }
+            set { _allowUndisclosedRecipients = value; }
+        }
+
+        [JsonProperty(PropertyName = "outlookBeta")]
+        public bool OutlookBeta
+        {
+            get { return _outlookBeta; }
+            set { _outlookBeta = value; }
+        }
     }
 }

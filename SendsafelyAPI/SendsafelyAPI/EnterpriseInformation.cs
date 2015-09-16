@@ -9,6 +9,8 @@ namespace SendSafely
 
         private String host;
         private String systemName;
+        private bool allowUndisclosedRecipients;
+        private bool outlookBeta;
 
         public String Host
         {
@@ -20,6 +22,18 @@ namespace SendSafely
         {
             get { return systemName; }
             set { systemName = value; }
+        }
+
+        public bool AllowUndisclosedRecipients
+        {
+            get { return allowUndisclosedRecipients; }
+            set { allowUndisclosedRecipients = value; }
+        }
+
+        public bool OutlookBeta
+        {
+            get { return outlookBeta; }
+            set { outlookBeta = value; }
         }
 
     }

@@ -43,10 +43,21 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Confirmation.cs" />
+    <Compile Include="APIKey.cs" />
+    <Compile Include="Exceptions\FileDownloadException.cs" />
+    <Compile Include="Exceptions\DuplicateUserException.cs" />
+    <Compile Include="Exceptions\RegistrationNotAllowedException.cs" />
+    <Compile Include="Exceptions\InvalidTokenException.cs" />
+    <Compile Include="Exceptions\PINRefreshException.cs" />
+    <Compile Include="Exceptions\TokenExpiredException.cs" />
+    <Compile Include="Exceptions\TwoFactorAuthException.cs" />
+    <Compile Include="Exceptions\InsufficientPasswordComplexityException.cs" />
+    <Compile Include="Exceptions\MessageVerificationException.cs" />
     <Compile Include="File.cs" />
     <Compile Include="CountryCodes.cs" />
     <Compile Include="EnterpriseInformation.cs" />
@@ -63,9 +74,16 @@
     <Compile Include="Exceptions\InvalidPackageException.cs" />
     <Compile Include="Exceptions\LimitExceededException.cs" />
     <Compile Include="Exceptions\InvalidCredentialsException.cs" />
+    <Compile Include="Exceptions\InvalidLinkException.cs" />
     <Compile Include="Objects\AddMessageRequest.cs" />
-    <Compile Include="Objects\CreateFileIdRequest.cs" />
+    <Compile Include="Objects\PackageDTO.cs" />
+    <Compile Include="Objects\DownloadFileRequest.cs" />
+    <Compile Include="Objects\StartRegistrationRequest.cs" />
+    <Compile Include="Objects\GenerateAPIKeyResponse.cs" />
+    <Compile Include="Objects\GenerateKeyRequest.cs" />
+    <Compile Include="Objects\FinishRegistrationRequest.cs" />
     <Compile Include="Objects\GetPackagesResponse.cs" />
+    <Compile Include="Objects\CreateFileIdRequest.cs" />
     <Compile Include="Objects\UpdatePackageRequest.cs" />
     <Compile Include="Objects\EnterpriseInformationResponse.cs" />
     <Compile Include="Objects\FinalizePackageRequest.cs" />
@@ -89,6 +107,7 @@
     <Compile Include="Objects\VersionResponse.cs" />
     <Compile Include="Recipient.cs" />
     <Compile Include="Utilities\CryptUtility.cs" />
+    <Compile Include="Utilities\DownloadFileUtility.cs" />
     <Compile Include="Utilities\EncodingUtil.cs" />
     <Compile Include="Utilities\EnterpriseUtility.cs" />
     <Compile Include="Utilities\FileUploader.cs" />
@@ -97,6 +116,8 @@
     <Compile Include="ClientAPI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISendSafelyProgress.cs" />
+    <Compile Include="Utilities\ParseLinksUtility.cs" />
+    <Compile Include="Utilities\RegistrationUtility.cs" />
     <Compile Include="Utilities\StartupUtility.cs" />
   </ItemGroup>
   <ItemGroup>

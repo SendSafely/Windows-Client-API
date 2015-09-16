@@ -23,7 +23,14 @@ namespace SendSafely.Objects
         AUTHENTICATION_FAILED,
         UNKNOWN_PACKAGE,
         INVALID_INPUT,
-        INVALID_RECIPIENT
+        TOKEN_EXPIRED,
+        INVALID_RECIPIENT,
+        PASSWORD_COMPLEXITY,
+        TWO_FA_REQUIRED,
+        AUTH_FORBIDDEN,
+        INVALID_TOKEN,
+        PIN_RESEND,
+        USER_ALREADY_EXISTS
     };
 
     /// <summary>

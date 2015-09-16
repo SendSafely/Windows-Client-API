@@ -97,6 +97,13 @@ namespace SendSafelyConsoleApplication
                     // Package is finished, call the finalize method to make the package available for pickup and print the URL for access.
                     String packageLink = ssApi.FinalizePackage(pkgInfo.PackageId, pkgInfo.KeyCode);
                     Console.WriteLine("Success: " + packageLink);
+
+                    // Download the file again.
+                    PackageInformation pkgToDownload = ssApi.GetPackageInformationFromLink(packageLink);
+                    foreach(File file in pkgToDownload.Files) {
+                        System.IO.FileInfo downloadedFile = ssApi.DownloadFile(pkgToDownload.PackageId, file.FileId, pkgToDownload.KeyCode, new ProgressCallback());
+            	        Console.WriteLine("Downloaded File to path: " + downloadedFile.FullName);
+                    }
                 }
                 catch (SendSafely.Exceptions.BaseException ex)
                 {

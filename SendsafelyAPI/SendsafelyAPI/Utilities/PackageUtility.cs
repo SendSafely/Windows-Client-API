@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using SendSafely.Objects;
@@ -11,7 +11,7 @@ namespace SendSafely
     internal class PackageUtility
     {
         private Connection connection;
-        private long SEGMENT_SIZE = 5242880; // 5 MB
+        private long SEGMENT_SIZE = 2621440;
 
         #region Constructors
         
@@ -50,20 +50,20 @@ namespace SendSafely
             return packageInfo;
         }
 
-        public List<String> GetActivePackages()
+        public List<PackageInformation> GetActivePackages()
         {
             Endpoint p = ConnectionStrings.Endpoints["activePackages"].Clone();
             GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
 
-            return response.Packages;
+            return Convert(response.Packages);
         }
 
-        public List<String> GetArchivedPackages()
+        public List<PackageInformation> GetArchivedPackages()
         {
             Endpoint p = ConnectionStrings.Endpoints["archivedPackages"].Clone();
             GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
 
-            return response.Packages;
+            return Convert(response.Packages);
         }
 
         public PackageInformation GetPackageInformation(String packageId)
@@ -72,27 +72,34 @@ namespace SendSafely
             p.Path = p.Path.Replace("{packageId}", packageId);
             PackageInformationResponse response = connection.Send<PackageInformationResponse>(p);
 
-            PackageInformation packageInfo = new PackageInformation();
-            packageInfo.PackageId = packageId;
-            packageInfo.PackageCode = response.PackageCode;
-            packageInfo.ServerSecret = response.ServerSecret;
-            packageInfo.Approvers = response.Approvers;
+            if (response.Response != APIResponse.SUCCESS)
+            {
+                throw new InvalidPackageException(response.Message);
+            }
 
-            packageInfo.Files = response.Files;
-            
-            packageInfo.NeedsApprover = response.NeedsApprover;
-            packageInfo.Recipients = response.Recipients;
-            packageInfo.Life = response.Life;
+            return Convert(response);
+        }
+
+        public PackageInformation GetPackageInformationFromLink(String link)
+        {
+            return GetPackageInformationFromLink(new Uri(link));
+        }
+
+        public PackageInformation GetPackageInformationFromLink(Uri link)
+        {
             try
             {
-                packageInfo.KeyCode = connection.GetKeycode(packageId);
-            }
-            catch (InvalidPackageException)
-            {
-                packageInfo.KeyCode = null;
-            }
+                String packageCode = getPackageCode(link);
+                String keyCode = getKeyCode(link);
 
-            return packageInfo;
+                PackageInformation pkgInfo = GetPackageInformation(packageCode);
+                pkgInfo.KeyCode = keyCode;
+                return pkgInfo;
+            }
+            catch (InvalidLinkException e)
+            {
+                throw new InvalidPackageException(e.Message);
+            }
         }
 
         public bool UpdatePackageLife(String packageId, int life)
@@ -162,6 +169,52 @@ namespace SendSafely
             }
 
             return recipient;
+        }
+
+        public String GetMessage(String secureLink)
+        {
+            if (secureLink == null)
+            {
+                throw new InvalidLinkException("The secure link can not be null");
+            }
+
+            // Get the package and keycode from the secure link.
+            String packageCode = getPackageCode(secureLink);
+            String keyCode = getKeyCode(secureLink);
+
+            VerifyKeycode(keyCode);
+
+            CryptUtility cu = new CryptUtility();
+            String checksum = cu.pbkdf2(keyCode, packageCode, 1024);
+
+            // Get the package information from the server so we can get the package ID and server secret.
+            PackageInformation packageInfo = this.GetPackageInformation(packageCode);
+
+            // Get the encrypted message.
+            Endpoint p = ConnectionStrings.Endpoints["getMessage"].Clone();
+            p.Path = p.Path.Replace("{packageId}", packageInfo.PackageId);
+            p.Path = p.Path.Replace("{checksum}", checksum);
+            StandardResponse response = connection.Send<StandardResponse>(p);
+
+            if (response.Response != APIResponse.SUCCESS)
+            {
+                throw new InvalidLinkException("Failed to fetch the message from the server. Make sure the URL is incorrect.");
+            }
+
+            if (response.Message == null || response.Message.Length == 0)
+            {
+                // We have no message, return null
+                return null;
+            }
+
+            // Finally, decrypt the message
+            String key = CreateEncryptionKey(packageInfo.ServerSecret, keyCode);
+            char[] passPhrase = key.ToCharArray();
+
+            CryptUtility _cu = new CryptUtility();
+            String message = _cu.DecryptMessage(response.Message, passPhrase);
+
+            return message;
         }
 
         public File EncryptAndUploadFile(String packageId, String keycode, String path, ISendSafelyProgress progress, String uploadType)
@@ -290,6 +343,27 @@ namespace SendSafely
             }
         }
 
+        public FileInfo DownloadFile(String packageId, String fileId, String keycode, ISendSafelyProgress progress, String downloadAPI)
+        {
+            if (packageId == null)
+            {
+                throw new InvalidPackageException("Package ID can not be null");
+            }
+
+            connection.AddKeycode(packageId, keycode);
+
+            // Get the updated package information.
+            PackageInformation packageInfo = GetPackageInformation(packageId);
+            packageInfo.KeyCode = keycode;
+            return DownloadFile(packageInfo, fileId, progress, downloadAPI);
+        }
+
+        public FileInfo DownloadFile(PackageInformation pkgInfo, String fileId, ISendSafelyProgress progress, String downloadAPI)
+        {
+            DownloadFileUtility downloadUtility = new DownloadFileUtility(connection, pkgInfo, progress, downloadAPI);
+            return downloadUtility.downloadFile(fileId);
+        }
+
         public String FinalizePackage(String packageId, String keycode)
         {
             if (packageId == null)
@@ -402,7 +476,101 @@ namespace SendSafely
         #endregion
 
         #region Private Functions
-        
+
+        private List<PackageInformation> Convert(List<PackageDTO> rawPackages)
+        {
+            List<PackageInformation> returnList = new List<PackageInformation>();
+            foreach (PackageDTO raw in rawPackages)
+            {
+                returnList.Add(Convert(raw));
+            }
+
+            return returnList;
+        }
+
+        private PackageInformation Convert(PackageDTO raw)
+        {
+            PackageInformation packageInfo = new PackageInformation();
+            packageInfo.PackageId = raw.PackageID;
+            packageInfo.PackageCode = raw.PackageCode;
+            packageInfo.ServerSecret = raw.ServerSecret;
+            packageInfo.Approvers = raw.Approvers;
+
+            packageInfo.Files = new List<File>();
+            foreach (String fileName in raw.Files)
+            {
+                File f = new File();
+                f.FileName = fileName;
+                packageInfo.Files.Add(f);
+            }
+
+            packageInfo.NeedsApprover = raw.NeedsApprover;
+
+            packageInfo.Recipients = new List<Recipient>();
+            foreach (String email in raw.Recipients)
+            {
+                Recipient r = new Recipient();
+                r.Email = email;
+                packageInfo.Recipients.Add(r);
+            }
+            packageInfo.Life = raw.Life;
+            try
+            {
+                packageInfo.KeyCode = connection.GetKeycode(raw.PackageID);
+            }
+            catch (InvalidPackageException)
+            {
+                packageInfo.KeyCode = null;
+            }
+
+            return packageInfo;
+        }
+
+        private PackageInformation Convert(PackageInformationResponse raw)
+        {
+            PackageInformation packageInfo = new PackageInformation();
+            packageInfo.PackageId = raw.PackageID;
+            packageInfo.PackageCode = raw.PackageCode;
+            packageInfo.ServerSecret = raw.ServerSecret;
+            packageInfo.Approvers = raw.Approvers;
+
+            packageInfo.Files = (raw.Files == null) ? new List<File>() : raw.Files;
+
+            packageInfo.NeedsApprover = raw.NeedsApprover;
+            packageInfo.Recipients = (raw.Recipients == null) ? new List<Recipient>() : raw.Recipients;
+            packageInfo.Life = raw.Life;
+            try
+            {
+                packageInfo.KeyCode = connection.GetKeycode(raw.PackageID);
+            }
+            catch (InvalidPackageException)
+            {
+                packageInfo.KeyCode = null;
+            }
+
+            return packageInfo;
+        }
+
+        private String getKeyCode(String secureLink)
+        {
+            Uri myUri = new Uri(secureLink);
+            return getKeyCode(myUri);
+        }
+
+        private String getKeyCode(Uri secureLink)
+        {
+            String fragment = secureLink.Fragment;
+
+            String keyCode = fragment.Substring(fragment.IndexOf("=") + 1);
+
+            if (keyCode == null)
+            {
+                throw new InvalidLinkException("The keycode could not be found in the Secure Link");
+            }
+
+            return keyCode;
+        }
+
         private FileInfo createSegment(FileStream inputStream, long bytesToRead) 
         {
             FileInfo segment = new FileInfo(Path.GetTempFileName());
@@ -505,6 +673,28 @@ namespace SendSafely
             {
                 throw new MissingKeyCodeException("Keycode is to short");
             }
+        }
+
+        private String getPackageCode(String link)
+        {
+            return getParameterFromURL(new Uri(link), "packageCode");
+        }
+
+        private String getPackageCode(Uri link)
+        {
+            return getParameterFromURL(link, "packageCode");
+        }
+
+        private String getParameterFromURL(Uri link, String parameter)
+        {
+            String packageCode = System.Web.HttpUtility.ParseQueryString(link.Query).Get(parameter);
+
+            if (packageCode == null)
+            {
+                throw new InvalidLinkException("Package code could not be found");
+            }
+
+            return packageCode;
         }
 
         #endregion

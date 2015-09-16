@@ -12,6 +12,7 @@ namespace SendSafely
         private String fileName;
         private String fileId;
         private long fileSize;
+        private int parts;
 
         /// <summary>
         /// The file name of the given file.
@@ -38,6 +39,15 @@ namespace SendSafely
         {
             get { return fileSize; }
             set { fileSize = value; }
+        }
+
+        /// <summary>
+        /// The number of parts this file is divided into.
+        /// </summary>
+        public int Parts
+        {
+            get { return parts; }
+            set { parts = value; }
         }
     }
 }
