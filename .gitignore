@@ -19,3 +19,10 @@ SampleConsoleApplication/bin/Debug/SendsafelyAPI.xml
 SampleConsoleApplication/obj/x86/Debug/SendSafelyConsoleApplication.csproj.FileListAbsolute.txt
 *.orig
 *.bak
+*.tmp
+
+SendsafelyAPI/obj/Debug/SendsafelyAPI.csproj.FileListAbsolute.txt
+
+SendsafelyAPI/obj/Debug/SendsafelyAPI.csproj.CopyComplete
+
+SendsafelyAPI/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs

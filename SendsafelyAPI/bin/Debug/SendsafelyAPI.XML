@@ -1,0 +1,1073 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SendsafelyAPI</name>
+    </assembly>
+    <members>
+        <member name="T:SendSafely.ClientAPI">
+            <summary>
+            The front facing class of the API. All interaction with SendSafely is done through this class
+            </summary>
+        </member>
+        <member name="M:SendSafely.ClientAPI.InitialSetup(System.String,System.String,System.String)">
+            <summary>
+            Initializes the API. This function must be called before the API can be used.</summary>
+            <param name="host"> The host which the API will connect to.</param>
+            <param name="apiKey"> The API Key which will be used to connect to SendSafely.</param>
+            <param name="apiSecret"> The private key used to verify the request.</param>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the credentials are incorrect.</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.InitialSetup(System.String,System.String,System.String,System.Net.WebProxy)">
+            <summary>
+            Initializes the API. This function must be called before the API can be used.</summary>
+            <param name="host"> The host which the API will connect to.</param>
+            <param name="apiKey"> The API Key which will be used to connect to SendSafely.</param>
+            <param name="apiSecret"> The private key used to verify the request.</param>
+            <param name="proxy"> A web proxy object which already contains proxy information.</param>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the credentials are incorrect.</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.StartRegistration(System.String)">
+            <summary>
+            Starts the registration process. If a valid email is provided, a validation code will be sent to the SendSafely servers.
+            </summary>
+            <param name="email">The email to register</param>
+            <exception cref="T:SendSafely.Exceptions.InvalidEmailException">Thrown when an incorrect email is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Thrown when the request failed for any other reason.</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.StartPINRegistration(System.String)">
+            <summary>
+            Starts the registration process. If a valid email is provided, a validation code will be sent to the SendSafely servers.
+            </summary>
+            <param name="email">The email to register</param>
+            <exception cref="T:SendSafely.Exceptions.InvalidEmailException">Thrown when an incorrect email is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.RegistrationNotAllowedException">Thrown when the user is not allowed to register</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Thrown when the request failed for any other reason.</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.FinishRegistration(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Finishes the registration process. Before this can be called a valid token must have been obtained.
+            </summary>
+            <param name="validationLink">The validation link which was sent to the specified email address</param>
+            <param name="password">The desired password</param>
+            <param name="secretQuestion">The secret question which is to be associated with the account</param>
+            <param name="answer">The answer answering the secret question</param>
+            <param name="firstName">The First name of the user</param>
+            <param name="lastName">The last name of the user</param>
+            <param name="keyDescription">A description describing the generated API key</param>
+            <exception cref="T:SendSafely.Exceptions.InsufficientPasswordComplexityException">Thrown when the password is to simple</exception>
+            <exception cref="T:SendSafely.Exceptions.TokenExpiredException">Thrown when the passed in token has expired</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidTokenException">Thrown when passed in token is incorrect</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.OAuthGenerateAPIKey(System.String,System.String)">
+            <summary>
+            Finishes the registration process. Before this can be called a valid oauth token must have been obtained.
+            </summary>
+            <param name="oauthToken">The Google oauth token used to look up the user</param>
+            <param name="keyDescription">A description describing the generated API key</param>
+            <exception cref="T:SendSafely.Exceptions.RegistrationNotAllowedException">Thrown when the user is not allowed to register</exception>
+            <exception cref="T:SendSafely.Exceptions.DuplicateUserException">Thrown when the user already has a valid username/password account</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the oauth token is incorrect</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.FinishPINRegistration(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Finishes the registration process. Before this can be called a pin code must have been obtained.
+            </summary>
+            <param name="email">The email to the user to finish registration for</param>
+            <param name="pincode">The pincode sent to the users email</param>
+            <param name="password">The desired password</param>
+            <param name="secretQuestion">The secret question which is to be associated with the account</param>
+            <param name="answer">The answer answering the secret question</param>
+            <param name="firstName">The First name of the user</param>
+            <param name="lastName">The last name of the user</param>
+            <param name="keyDescription">A description describing the generated API key</param>
+            <exception cref="T:SendSafely.Exceptions.InsufficientPasswordComplexityException">Thrown when the password is to simple</exception>
+            <exception cref="T:SendSafely.Exceptions.TokenExpiredException">Thrown when the passed in token has expired</exception>
+            <exception cref="T:SendSafely.Exceptions.PINRefreshException">Thrown when a new Email PIN has been sent to the user</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidTokenException">Thrown when passed in token is incorrect</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GenerateAPIKey(System.String,System.String,System.String)">
+            <summary>
+            Generate a new API Key given a username and password.
+            </summary>
+            <param name="username">The email address of the given user.</param>
+            <param name="password">The password belonging to the user</param>
+            <param name="keyDescription">A description describing the generated API key</param>
+            <exception cref="T:SendSafely.Exceptions.TwoFactorAuthException">Thrown when two factor authentication is required. The exception contains a ValidationToken that must be used in the subsequent request</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the username/password combination is wrong.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Thrown if any other error occurs</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GenerateKey2FA(System.String,System.String,System.String)">
+            <summary>
+            Generate a new API Key given a validation token and a SMS Code.
+            </summary>
+            <param name="validationLink">The validation link associated with the user.</param>
+            <param name="smsCode">The smsCode sent to the users phone</param>
+            <param name="keyDescription">A description describing the generated API key</param>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown if the SMS Code is incorrect</exception>
+            <exception cref="T:SendSafely.Exceptions.PINRefreshException">Thrown if there's been to many failed attempts and a new SMS code is needed</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Thrown if any other error occured</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.VerifyVersion">
+            <summary>
+            Verifies the version using the API Key.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns OK, UPGRADE_AVAILABLE or OUTDATED_VERSION depending on the response from the Server.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.VerifyCredentials">
+            <summary>
+            Verifies the API and secret key against the server. Returns the user email which is associated with the key.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the users email.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GenerateKeyPair(System.String)">
+            <summary>
+            Generates a new RSA Key pair used to encrypt keycodes. The private key as well as an identifier associating the public Key is returned to the user. 
+            The public key is uploaded and stored on the SendSafely servers.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns a Private Key containing the armored private key and a Public Key ID associating a public key to the private key.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.RevokePublicKey(System.String)">
+            <summary>
+            Revokes a public key from the server. Only call this if the private key has been deleted and should not be used anymore.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.RevokingKeyFailedException">Thrown if the revoke failed</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetKeycode(SendSafely.PrivateKey,System.String)">
+            <summary>
+            Downloads and decrypts a keycode from the Server given a packageId and a private key. 
+            </summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.GettingKeycodeFailedException">Will be thrown if the server returns an error message while downloading the keycode</exception>
+            <returns>
+            Returns the decrypted keycode
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.ParseLinksFromText(System.String)">
+            <summary>
+            Parses out SendSafely links from a String of text.
+            </summary>
+            <returns>
+            Returns a list of SendSafely links found in the text String.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetEnterpriseInfo">
+            <summary>
+            Retrieves enterprise related information such as the hostname specific to the organization as well as the SendSafely name of the organization.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns an object containing the retrieved information.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.CreatePackage">
+            <summary>
+            Creates a new package and returns the package information of the newly created package.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.CreatePackage(System.Boolean)">
+            <summary>
+            Creates a new workspace (package) and returns the package information of the newly created package.
+            </summary>
+            <param name="isWorkspace"></param>
+            <returns>Returns the package information object on the newly created package</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.CreatePackageForUser(System.String)">
+            <summary>
+            Creates a new package on behalf of the specified user and returns the package information of the newly created package. API user
+            must be a SendSafely administrator.
+            </summary>
+            <param name="email"> The email address of the user to create the package as (only for enterprise)</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.CreateDirectory(System.String,System.String,System.String)">
+            <summary>
+            Creates a directory and returns the directory information
+            </summary>
+            <param name="packageId"></param>
+            <param name="parentDirectoryId"></param>
+            <param name="directoryName"></param>
+            <returns>Returns the package information object on the newly created package</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DeleteDirectory(System.String,System.String)">
+            <summary>
+            Deletes a target directory within a package
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetActivePackages">
+            <summary>
+            Retrieves a list of all active packages for the given API Key.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A List containing package metadata for all active packages.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetReceivedPackages">
+            <summary>
+            Retrieves a list of all active recieved packages for the given API User.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A List containing package metadata for all received packages.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetArchivedPackages">
+            <summary>
+            Retrieves a list of all active packages for the given API Key.</summary>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A List containing package metadata for all archived packages.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetRecipientHistory(System.String)">
+            <summary>
+            Retrieves all packages with given Recipient.</summary>
+            <param name="recipientEmail"> The recipient Email for which the packages information should be fetched.</param>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetDirectory(System.String,System.String)">
+            <summary>
+            Gets the directory from a given directory id
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <returns>Returns the directory object of the newly created directory</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.MoveDirectory(System.String,System.String,System.String)">
+            <summary>
+            Moves a directory to a new directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="sourceDirectoryId"></param>
+            <param name="destinationDirectoryId"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.RenameDirectory(System.String,System.String,System.String)">
+            <summary>
+            Renames a target directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="directoryName"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.MoveFile(System.String,System.String,System.String)">
+            <summary>
+            Move a given file to a new directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="fileId"></param>
+            <param name="destinationDirectoryId"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetPackageInformation(System.String)">
+            <summary>
+            Retrieves the information for the current package.</summary>
+            <param name="packageId"> The package ID for which information should be fetched.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetPackageInformationFromLink(System.String)">
+            <summary>
+            Retrieves the information for the current package given a SendSafely link.</summary>
+            <param name="link">The link identiying the package.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid link is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.getPackageInformationFromLink(System.Uri)">
+            <summary>
+            Retrieves the information for the current package given a SendSafely link.</summary>
+            <param name="packageId">The link identiying the package.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid link ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            A PackageInfo object containing information about the package.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.UpdatePackageLife(System.String,System.Int32)">
+            <summary>
+            Retrieves the information for the current package.</summary>
+            <param name="packageId"> The package ID for which information should be fetched.</param>
+            <param name="life"> The new life.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message or if the action is denied.</exception>
+            <returns>
+            A bool indicating if the call was successfull or not.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadFile(System.String,System.String,SendSafely.ISendSafelyProgress)">
+            <summary>
+            Uploads a file to the given package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="packageId"> The packageId which is identifying the package to where a file should be added.</param>
+            <param name="path">The path to the file.</param>
+            <param name="progress">A progress object to where progress will be called back to.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.FileUploadException">Thrown when a file segment failed to upload a couple of times. Will usually happen when the internet connection is lost or very weak.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns a file object referencing the file.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadFile(System.String,System.String,System.String,SendSafely.ISendSafelyProgress)">
+            <summary>
+            Uploads a file to the given package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="packageId"> The packageId which is identifying the package to where a file should be added.</param>
+            <param name="keyCode">The key which will be used to encrypt the file with.</param>
+            <param name="path">The path to the file.</param>
+            <param name="progress">A progress object to where progress will be called back to.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.FileUploadException">Thrown when a file segment failed to upload a couple of times. Will usually happen when the internet connection is lost or very weak.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns a file object referencing the file.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadFileInDirectory(System.String,System.String,System.String,System.String,SendSafely.ISendSafelyProgress)">
+            <summary>
+            Encrypts and uploads a file in a directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="keyCode"></param>
+            <param name="path"></param>
+            <param name="progress"></param>
+            <returns>Returns the newly uploaded file object</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadFileInDirectory(System.String,System.String,System.String,System.String,SendSafely.ISendSafelyProgress,System.String)">
+            <summary>
+            Encrypts and uploads a file in a directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="keyCode"></param>
+            <param name="path"></param>
+            <param name="progress"></param>
+            <param name="uploadType"></param>
+            <returns>Returns the newly uploaded file object</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadMessage(System.String,System.String)">
+            <summary>
+            Adds a message to the given package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="packageId"> The packageId which is identifying the package to where a file should be added.</param>
+            <param name="message">The message to encrypt and upload.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.EncryptAndUploadMessage(System.String,System.String,System.String)">
+            <summary>
+            Adds a message to the given package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="packageId"> The packageId which is identifying the package to where a file should be added.</param>
+            <param name="keyCode">The key which will be used to encrypt the file with.</param>
+            <param name="message">The message to encrypt and upload.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetFileInformation(System.String,System.String,System.String)">
+            <summary>
+            Gets file information on a file within a given directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="fileId"></param>
+            <returns>Returns information on the file </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetMessage(System.String)">
+            <summary>
+            Downloads and decrypts a message for the given secure link
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="secureLink">The link from where to download the message</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the decrypted message
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DownloadFile(System.String,System.String,System.String,SendSafely.ISendSafelyProgress)">
+            <summary>
+            Downloads and decrypts a file given a package and a file ID
+            </summary>
+            <param name="packageId">The Package Identifier to grab the file from</param>
+            <param name="fileId">The file to download</param>
+            <param name="keyCode">The key which will be used to decrypt the file with.</param>
+            <param name="progress">A progress object to where progress will be called back to.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the decrypted file
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DownloadFile(System.String,System.String,System.String,SendSafely.ISendSafelyProgress,System.String)">
+            <summary>
+            Downloads and decrypts a file given a package and a file ID
+            </summary>
+            <param name="packageId">The Package Identifier to grab the file from</param>
+            <param name="fileId">The file to download</param>
+            <param name="keyCode">The key which will be used to decrypt the file with.</param>
+            <param name="progress">A progress object to where progress will be called back to.</param>
+            <param name="downloadAPI">A String identifying the API which is downloading the file. Defaults to "CSHARP".</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the decrypted file
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DownloadFile(System.String,System.String,System.String,SendSafely.ISendSafelyProgress,System.String,System.String)">
+            <summary>
+            Downloads and decrypts a file given a package and a file ID
+            </summary>
+            <param name="packageId">The Package Identifier to grab the file from</param>
+            <param name="fileId">The file to download</param>
+            <param name="keyCode">The key which will be used to decrypt the file with.</param>
+            <param name="progress">A progress object to where progress will be called back to.</param>
+            <param name="downloadAPI">A String identifying the API which is downloading the file. Defaults to "CSHARP".</param>
+            <param name="password">Password for protecting a package when recipients are not specified.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the decrypted file
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DownloadFileFromDirectory(System.String,System.String,System.String,System.String,SendSafely.ISendSafelyProgress)">
+            <summary>
+            Downloads a file from a directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="fileId"></param>
+            <param name="keyCode"></param>
+            <param name="progress"></param>
+            <returns>System file info object</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DownloadFileFromDirectory(System.String,System.String,System.String,System.String,SendSafely.ISendSafelyProgress,System.String)">
+            <summary>
+            downloads a file from a directory
+            
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="fileId"></param>
+            <param name="keyCode"></param>
+            <param name="progress"></param>
+            <returns>System File Info Object</returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DeleteFile(System.String,System.String,System.String)">
+            <summary>
+            Deletes a file from a workspace directory
+            </summary>
+            <param name="packageId"></param>
+            <param name="directoryId"></param>
+            <param name="fileId"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.AddRecipient(System.String,System.String)">
+            <summary>
+            Adds a recipient to a given package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>.</summary>
+            <param name="packageId"> The packageId referencing the package to where a new recipient should be added.</param>
+            <param name="email"> The recipient email to be added.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidEmailException">Thrown when the given email is incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns a recipient object describing the newly added Recipient.
+            </returns>
+        </member>
+        <member name="M:SendSafely.ClientAPI.AddRecipientPhoneNumber(System.String,System.String,System.String,SendSafely.CountryCodes.CountryCode)">
+            <summary>
+            Updates a recipient by giving it a phone number. A package must have been created and the recipient 
+            must have been added before this function can be called. 
+            See <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso></summary>
+            <param name="packageId"> The packageId referencing the package to where the recipient belongs.</param>
+            <param name="recipientId"> The recipientId to which, a phone number should be added.</param>
+            <param name="phoneNumber"> The phonenumber to add.</param>
+            <param name="countryCode"> The country code to where the phone number belongs.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPhonenumberException">Thrown when the phonenumber or country code is incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidRecipientException">Thrown when the recipientId is invalid.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.AddDropzoneRecipient(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.GetDropzoneRecipients" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.RemoveDropzoneRecipient(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.CreateContactGroup(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.DeleteContactGroup(System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.AddUserToContactGroup(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.RemoveUserFromContactGroup(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.getContactGroups" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.getEnterpriseContactGroups" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.AddRecipients(System.String,System.Collections.Generic.List{System.String})" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.AddContactGroupToPackage(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.RemoveContactGroupFromPackage(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.RemoveRecipient(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.GetRecipient(System.String,System.String)" -->
+        <member name="M:SendSafely.ClientAPI.FinalizePackage(System.String,System.String)">
+            <summary>
+            Finalizes the package so it can be delivered to the recipients. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">createPackage()</seealso>. Additionally, the package must contain at least one file.</summary>
+            <param name="packageId"> The packageID referencing the object which should be finalized.</param>
+            <param name="keycode"> The keycode, which will be included in the link which should be delivered to the recipients.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+            <exception cref="T:SendSafely.Exceptions.PackageFinalizationException">Thrown when the package couldn't be finalized. The message will contain detailed information</exception>
+            <exception cref="T:SendSafely.Exceptions.MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+            <returns>
+            Returns the link needed to access the package.
+            </returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.FinalizeUndisclosedPackage(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:SendSafely.ClientAPI.FinalizeUndisclosedPackage(System.String,System.String,System.String)" -->
+        <member name="M:SendSafely.ClientAPI.DeleteTempPackage(System.String)">
+            <summary>
+            Deletes a temporary package. This action must be called before the package is finalized. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">CreatePackage()</seealso>.</summary>
+            <param name="packageId"> The packageID referencing the object which should be deleted.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.DeletePackage(System.String)">
+            <summary>
+            Deletes a package. Before this function can be called, the package must have been created with 
+            <seealso cref="M:SendSafely.ClientAPI.CreatePackage">CreatePackage()</seealso>.</summary>
+            <param name="packageId"> The packageID referencing the object which should be deleted.</param>
+            <exception cref="T:SendSafely.Exceptions.APINotInitializedException">Thrown when the API has not been initialized.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+            <exception cref="T:SendSafely.Exceptions.ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+            <exception cref="T:SendSafely.Exceptions.InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+            <exception cref="T:SendSafely.Exceptions.ActionFailedException">Will be thrown if the server returns an error message</exception>
+        </member>
+        <member name="M:SendSafely.ClientAPI.UpdatePackageDescriptor(System.String,System.String)">
+            <summary>
+            Updates a package name
+            </summary>
+            <param name="packageId"></param>
+            <param name="packageDescriptor"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.UpdateRecipientRole(System.String,System.String,System.String)">
+            <summary>
+            updates a recipient role
+            </summary>
+            <param name="packageId"></param>
+            <param name="recipientId"></param>
+            <param name="role"></param>
+        </member>
+        <member name="M:SendSafely.ClientAPI.GetActivityLog(System.String,System.Int32)">
+            <summary>
+            Gets the activity log on a package
+            </summary>
+            <param name="packageId"></param>
+            <param name="rowIndex"></param>
+            <returns>List of Actiity Log Entries</returns>
+        </member>
+        <member name="T:SendSafely.Confirmation">
+            <summary>
+            A class describing a confirmation. A confirmation is added to the recipient object every time a file is downloaded 
+            </summary>
+        </member>
+        <member name="P:SendSafely.Confirmation.IPAddress">
+            <summary>
+            The IP Address from where the file was downloaded.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Confirmation.TimeStamp">
+            <summary>
+            A time stamp from when the file was downloaded
+            </summary>
+        </member>
+        <member name="P:SendSafely.Confirmation.File">
+            <summary>
+            The file object that was downloaded
+            </summary>
+        </member>
+        <member name="P:SendSafely.Confirmation.isMessage">
+            <summary>
+            A flag indicating if the confirmation is for a message. If it is, the File object will be null
+            </summary>
+        </member>
+        <member name="T:SendSafely.CountryCodes.CountryCode">
+            <summary>
+            All available country codes. SendSafely can only send text messages to phone numbers belonging to these countries.
+            </summary>
+        </member>
+        <member name="F:SendSafely.CountryCodes.list">
+            <summary>
+            Will, given a CountryCode return the country name.
+            </summary>
+        </member>
+        <member name="T:SendSafely.File">
+            <summary>
+            A class describing a sendsafely file.
+            </summary>
+        </member>
+        <member name="P:SendSafely.File.FileName">
+            <summary>
+            The file name of the given file.
+            </summary>
+        </member>
+        <member name="P:SendSafely.File.FileId">
+            <summary>
+            The file ID of the given file.
+            </summary>
+        </member>
+        <member name="P:SendSafely.File.FileSize">
+            <summary>
+            The file size of the given file.
+            </summary>
+        </member>
+        <member name="P:SendSafely.File.Parts">
+            <summary>
+            The number of parts this file is divided into.
+            </summary>
+        </member>
+        <member name="T:SendSafely.ISendSafelyProgress">
+            <summary>
+            Implement this interface to receive progress on how the encryption/signature/upload is progressing. 
+            The double will be between 0 and 100.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Objects.APIResponse">
+            <summary>
+            A list of responses that will be returned by the server. Every server response should contain an APIResponse
+            </summary>
+        </member>
+        <member name="T:SendSafely.Objects.Version">
+            <summary>
+            An enum describing if there is an update available for the API.
+            </summary>
+        </member>
+        <member name="F:SendSafely.Objects.Version.OK">
+            <summary>
+            The API is up to date. No updates are available.
+            </summary>
+        </member>
+        <member name="F:SendSafely.Objects.Version.UPGRADE_AVAILABLE">
+            <summary>
+            There is an upgrade available and it is recommended that a new version is installed. 
+            The current version will still function but might be deprecated in the future.
+            </summary>
+        </member>
+        <member name="F:SendSafely.Objects.Version.OUTDATED_VERSION">
+            <summary>
+            A new version of the API must be downloaded for the API to be fully functioning.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Objects.PackageInformationResponse.ContactGroups">
+            <summary>
+            A list of contact groups
+            </summary>
+        </member>
+        <member name="P:SendSafely.Objects.PackageInformationResponse.State">
+            <summary>
+            a string of state
+            </summary>
+        </member>
+        <member name="T:SendSafely.PackageInformation">
+            <summary>
+            This object will contain information about a package. Once a package is created this object will be returned. 
+            If it is passed along when adding recipients and files the object will be updated accordingly.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.PackageId">
+            <summary>
+            The package ID for the given package.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.PackageCode">
+            <summary>
+            The package code for the given package. The package code is a part of the URL that must be sent to the recipients.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.KeyCode">
+            <summary>
+            The keycode for the package. This key should always be kept client side and never be sent to the server. 
+            The keycode makes up one part of the encryption key.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.ServerSecret">
+            <summary>
+            The server secret makes together with the keycode up the encryption key. The server secret is specific 
+            to a package and passed from the server.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.NeedsApprover">
+            <summary>
+            NeedsApprover will be true when a package needs to add at least one approver before the package can be finalized.
+            If the package is finalized without the approver, an exception will be thrown.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.Recipients">
+            <summary>
+            A list of recipients that are currently attached to the package.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.Files">
+            <summary>
+            A list of files that are currently attached to the package.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.Approvers">
+            <summary>
+            A list of approvers that are currently attached to the package.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.Life">
+            <summary>
+            The current package life. The package life determines for how long the package 
+            should be available to the recipients. It's measured in days.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.PackageTimestamp">
+            <summary>
+            The timestamp of when the package was finalized.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PackageInformation.ContactGroups">
+            <summary>
+            A list of contact groups
+            </summary>
+        </member>
+        <member name="T:SendSafely.PhoneNumber">
+            <summary>
+            An object referencing a phone number. Contains two public variables, a CountryCode and a phonenumber.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PhoneNumber.CountryCode">
+            <summary>
+            The phone numbers country code.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PhoneNumber.Number">
+            <summary>
+            The phone number itself.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Recipient">
+            <summary>
+            A class describing a sendsafely recipient. This class makes up of an email, 
+            a unique ID and a flag indicating if approval is needed for the recipient.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.RecipientId">
+            <summary>
+            The recipient ID. Each recipient is given a unique ID once it's added. 
+            Use this ID to update the recipient in the future. The ID is unique to every package.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.Email">
+            <summary>
+            The email belonging to the recipient.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.NeedsApproval">
+            <summary>
+            A flag indicating approval is needed or not for the recipient. The value of this flag will 
+            depend on your enterprise settings as well as if the email belongs to a domain outside 
+            of the organization or not.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.Approvers">
+            <summary>
+            A list of all possible approvers for the given recipient.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.PhoneNumbers">
+            <summary>
+            A list of all phonenumbers that was used for this recipient in the past.
+            </summary>
+        </member>
+        <member name="P:SendSafely.Recipient.Confirmations">
+            <summary>
+            A list of all confirmations for the recipient. A confirmation will be added as soon as 
+            a recipient has downloaded one or more files from the item.
+            </summary>
+        </member>
+        <member name="T:SendSafely.User">
+            <summary>
+            This object will contain information about a package. Once a package is created this object will be returned. 
+            If it is passed along when adding recipients and files the object will be updated accordingly.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.APINotInitializedException">
+            <summary>
+            Will be thrown when the API is not yet initialized.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.ActionFailedException">
+            <summary>
+            This exception is thrown when the server returned an unexpected response message. The reason can be found in the 
+            Reason variable. The exception message will contain a longer explanation to the error.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.AddingPublicKeyFailedException">
+            <summary>
+            Thrown when we failed to create and add a public key
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.ApproverRequiredException">
+            <summary>
+            Will be thrown if a package that requires an approver is finalized without having one. 
+            When this is thrown, an approver must be added as a recipient before the package can be finalized.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.BaseException">
+            <summary>
+            The BaseException from which all SendSafely exceptions inherit from. By catching this class all custom SendSafely exceptions will be caught.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.DuplicateUserException">
+            <summary>
+            Thrown when a Google Auth user already exists as a native user
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.FileDownloadException">
+            <summary>
+            Generic upload exception which can be thrown when an exception is thrown during the upload or encryption phase.
+            The most common reason for this exception is an interrupted internet connection.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.FileUploadException">
+            <summary>
+            Generic upload exception which can be thrown when an exception is thrown during the upload or encryption phase.
+            The most common reason for this exception is an interrupted internet connection.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.GettingKeycodeFailedException">
+            <summary>
+            Thrown when we failed to create and add a public key
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InsufficientPasswordComplexityException">
+            <summary>
+            Thrown when the specified user's password does not match the servers demand on password complexity.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidCredentialsException">
+            <summary>
+            Thrown when the API key, secret key or both is incorrect. The exception message might contain more detailed information.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidEmailException">
+            <summary>
+            Thrown when an invalid email is used as a recipient email. The email can either be 
+            in an incorrect format or the same email can already be attached to the package.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidKeyException">
+            <summary>
+            Thrown when the public key does not contain a public key
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidLinkException">
+            <summary>
+            Thrown when an invalid package secure link is used. Will be thrown if the link is null, incorrect or for some reason inaccessible.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidPackageException">
+            <summary>
+            Thrown when an invalid package ID is used. Will be thrown if the package ID is null, non-existent or for some reason inaccessible.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidPhonenumberException">
+            <summary>
+            Thrown when the supplied phone number is in a format not recognized by the server.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidRecipientException">
+            <summary>
+            Thrown when an attempt to update a recipient with an incorrect recipient ID is made.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.InvalidTokenException">
+            <summary>
+            Thrown when the user supplies an invalid token or pin code to the server.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.LimitExceededException">
+            <summary>
+            Thrown when the account limitation is exceeded for the user. 
+            The exception message will contain information about what limitation has been exceeded.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.MessageVerificationException">
+            <summary>
+            Will be thrown when the API is not yet initialized.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.MissingKeyCodeException">
+            <summary>
+            Thrown when a keycode is needed but not found by the API. If the keycode is not present it must be passed into the application by the user.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.PINRefreshException">
+            <summary>
+            Thrown when an invalid PIN has been used 5 or more times. When that happens the server will send a new pin to the users email that should be used instead.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.PackageFinalizationException">
+            <summary>
+            Thrown when the package can for some reason not be finalized. 
+            The exception contains a list of errors that prevented the finalization.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.PackageNeedsApprovalException">
+            <summary>
+            Thrown when a package approval is needed in order for the recipients to be able to access the package. 
+            When this exception is thrown the approvers must be notified so they can download and approve the other recipients.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.RegistrationNotAllowedException">
+            <summary>
+            Thrown when a user is not allowed to register an account. This will likely happen because the users organization does not allow it.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.RevokingKeyFailedException">
+            <summary>
+            Thrown when we failed to revoke a public key
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.ServerUnavailableException">
+            <summary>
+            Thrown when the API fails to connect to the server.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.TokenExpiredException">
+            <summary>
+            Thrown when the token or PIN has expired. When this happens, the client should reach out and ask for a new token.
+            </summary>
+        </member>
+        <member name="T:SendSafely.Exceptions.TwoFactorAuthException">
+            <summary>
+            Thrown when two factor authentication is required. The exception contains a ValidationToken parameter that must be used when validating the 2FA Code.
+            </summary>
+        </member>
+        <member name="T:SendSafely.PublicKeyRaw">
+            <summary>
+            An object referencing a phone number. Contains two public variables, a CountryCode and a phonenumber.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PublicKeyRaw.ID">
+            <summary>
+            The phone numbers country code.
+            </summary>
+        </member>
+        <member name="P:SendSafely.PublicKeyRaw.Key">
+            <summary>
+            The phone number itself.
+            </summary>
+        </member>
+    </members>
+</doc>
