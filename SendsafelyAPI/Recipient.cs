@@ -76,6 +76,9 @@ namespace SendSafely
             set { confirmations = value; }
         }
 
+        /// <summary>
+        /// The role name associate with the recipient.
+        /// </summary>
         public String RoleName 
         {
             get { return roleName; }

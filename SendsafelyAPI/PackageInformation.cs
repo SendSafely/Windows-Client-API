@@ -124,36 +124,54 @@ namespace SendSafely
             set { packageTimestamp = value; }
         }
 
+        /// <summary>
+        /// The Package Owner of the package.
+        /// </summary>
         public String PackageOwner
         {
             get { return packageOwner; }
             set { packageOwner = value; }
         }
 
+        /// <summary>
+        /// The state of the pakage.
+        /// </summary>
         public String State
         {
             get { return state; }
             set { state = value; }
         }
 
+        /// <summary>
+        /// The status of the package.
+        /// </summary>
         public PackageStatus Status
         {
             get { return status; }
             set { status = value; }
         }
 
+        /// <summary>
+        /// The root directory of a workspace package.
+        /// </summary>
         public String RootDirectoryId
         {
             get { return rootDirectoryId; }
             set { rootDirectoryId = value; }
         }
 
+        /// <summary>
+        /// The package descriptor.
+        /// </summary>
         public String PackageDescriptor
         {
             get { return packageDescriptor; }
             set { packageDescriptor = value; }
         }
 
+        /// <summary>
+        /// The flag specifying the package is a workspace.
+        /// </summary>
         public Boolean IsWorkspace
         {
             get { return isWorkspace; }

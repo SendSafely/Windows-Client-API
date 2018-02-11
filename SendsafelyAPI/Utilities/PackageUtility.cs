@@ -992,6 +992,23 @@ namespace SendSafely
             return response.ContactGroupId;
         }
 
+        public String CreateContactGroup(String groupName, String isEnterpriseGroup)
+        {
+
+            Endpoint p = ConnectionStrings.Endpoints["createContactGroup"].Clone();
+
+            AddContactGroupRequest request = new AddContactGroupRequest();
+            request.GroupName = groupName;
+            request.IsEnterpriseGroup = isEnterpriseGroup;
+            AddContactGroupResponse response = connection.Send<AddContactGroupResponse>(p, request);
+
+            if (response.Response != APIResponse.SUCCESS)
+            {
+                throw new ActionFailedException(response.Response.ToString(), response.Message);
+            }
+            return response.ContactGroupId;
+        }
+
         public void DeleteContactGroup(string groupId)
         {
 
