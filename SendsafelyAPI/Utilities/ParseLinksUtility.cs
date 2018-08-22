@@ -7,7 +7,7 @@ namespace SendSafely.Utilities
 {
     class ParseLinksUtility
     {
-        private String REGEX = "(https:\\/\\/[a-zA-Z\\.]+\\/receive\\/\\?[A-Za-z0-9&=\\-]+packageCode=[A-Za-z0-9\\-_]+#keyCode=[A-Za-z0-9\\-_]+)";
+        private String REGEX = "(https:\\/\\-\\/[a-zA-Z\\.]+\\/receive\\/\\?[A-Za-z0-9&=\\-]+packageCode=[A-Za-z0-9\\-_]+#keyCode=[A-Za-z0-9\\-_]+)";
 
         public List<String> Parse(String text)
         {
