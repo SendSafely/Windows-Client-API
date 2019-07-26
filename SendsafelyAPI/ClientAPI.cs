@@ -332,8 +332,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Deletes a temporary package. This action must be called before the package is finalized. Before this function can be called, the package must have been created with 
-        /// <seealso cref="CreatePackage()">CreatePackage()</seealso>.
+        /// Deletes a temporary package, which is a package that has not yet been finalized. 
         /// </summary>
         /// <param name="packageId"> The unique package id of the package to be deleted.</param>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
@@ -853,6 +852,15 @@ namespace SendSafely
         /// <returns>
         /// List<ContactGroup> object of Contact Groups and email addresses.
         /// </returns>
+        public List<ContactGroup> GetContactGroups()
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetContactGroups(false);
+        }
+
+        [Obsolete("getContactGroups is deprecated, please use GetContactGroups instead", false)]
         public List<ContactGroup> getContactGroups()
         {
             EnforceInitialized();
@@ -897,6 +905,15 @@ namespace SendSafely
         /// <returns>
         /// List<ContactGroup> object of Contact Groups and email addresses.
         /// </returns>
+        public List<ContactGroup> GetEnterpriseContactGroups()
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetContactGroups(true);
+        }
+
+        [Obsolete("getEnterpriseContactGroups is deprecated, please use GetEnterpriseContactGroups instead", false)]
         public List<ContactGroup> getEnterpriseContactGroups()
         {
             EnforceInitialized();
@@ -940,9 +957,9 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Downloads and decrypts a keycode from the Server given a packageId and a private key. 
+        /// Downloads and decrypts a keycode from the server for a given packageId and RSA Key pair. 
         /// </summary>
-        /// <param name="privateKey">The private key associated with the package for the keycode.</param>
+        /// <param name="privateKey">The private key associated with the RSA Key pair used to encrypt the package keycode.</param>
         /// <param name="packageId">The package id for the keycode.</param>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
         /// <exception cref="GettingKeycodeFailedException">Will be thrown if the server returns an error message while downloading the keycode.</exception>
@@ -1035,6 +1052,20 @@ namespace SendSafely
         /// <returns>
         /// A PackageInformation object containing information about the package.
         /// </returns>
+        public PackageInformation GetPackageInformationFromLink(Uri link)
+        {
+            EnforceInitialized();
+
+            if (link == null)
+            {
+                throw new InvalidPackageException("The supplied link is null");
+            }
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetPackageInformationFromLink(link);
+        }
+
+        [Obsolete("getPackageInformationFromLink is deprecated, please use GetPackageInformationFromLink instead", false)]
         public PackageInformation getPackageInformationFromLink(Uri link)
         {
             EnforceInitialized();
@@ -1094,7 +1125,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Retrieves a list of all active received packages for the given API User.
+        /// Retrieves a list of all active packages received for the given API User.
         /// </summary>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
         /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
@@ -1130,11 +1161,11 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Retrieves all packages belonging to the given Recipient.
+        /// Retrieves a list of packages where the passed in email address is a package recipient.
         /// </summary>
-        /// <param name="recipientEmail"> The recipient Email for which the packages information should be fetched.</param>
+        /// <param name="recipientEmail"> The email address of the recipient.</param>
         /// <returns>
-        /// A PackageInfo object containing information about the package.
+        /// A PackageInfo object containing information about each package retrieved, including confirmed downloads for the recipient.
         /// </returns>
         public List<RecipientHistory> GetRecipientHistory(String recipientEmail)
         {

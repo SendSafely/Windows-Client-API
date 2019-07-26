@@ -40,7 +40,8 @@ namespace SendSafely
             ES = 34,
             SE = 46,
             CH = 41,
-            AE = 971
+            AE = 971,
+            OT
         };
 
         /// <summary>
@@ -76,7 +77,8 @@ namespace SendSafely
             { CountryCode.ES, "Spain" },
             { CountryCode.SE, "Sweden" },
             { CountryCode.CH, "Switzerland" },
-            { CountryCode.AE, "United Arab Emirates" }
+            { CountryCode.AE, "United Arab Emirates" },
+            { CountryCode.OT, "Other" }
         };
     }
 }
