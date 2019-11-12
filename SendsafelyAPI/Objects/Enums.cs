@@ -27,6 +27,7 @@ namespace SendSafely.Objects
         INVALID_RECIPIENT,
         PASSWORD_COMPLEXITY,
         TWO_FA_REQUIRED,
+        TWO_FA_ENFORCED,
         AUTH_FORBIDDEN,
         INVALID_TOKEN,
         PIN_RESEND,

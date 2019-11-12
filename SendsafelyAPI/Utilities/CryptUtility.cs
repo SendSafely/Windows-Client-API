@@ -148,8 +148,8 @@ namespace SendSafely.Utilities
 
         public String EncryptMessage(String unencryptedMessage, char[] passPhrase)
         {
-            // Convert the input to a byte array. Since it's text we will interpret it as Ascii
-            byte[] unencryptedByteArray = System.Text.Encoding.ASCII.GetBytes (unencryptedMessage);
+            // Convert the input to a byte array. We expect the string to be UTF-8 encoded
+            byte[] unencryptedByteArray = System.Text.Encoding.UTF8.GetBytes (unencryptedMessage);
 	        
 	        PgpLiteralDataGenerator lData = new PgpLiteralDataGenerator();
 	
@@ -323,7 +323,7 @@ namespace SendSafely.Utilities
                 privateKey,
                 DateTime.Now,
                 email,
-                SymmetricKeyAlgorithmTag.Aes256,
+                SymmetricKeyAlgorithmTag.Null,
                 null,
                 null,
                 null,
