@@ -221,7 +221,7 @@ namespace SendSafely
 
         public void UpdatePackageDescriptor(String packageId, String packageDescriptor)
         {
-            Endpoint p = ConnectionStrings.Endpoints["updatePackageDescriptor"].Clone();
+            Endpoint p = ConnectionStrings.Endpoints["updatePackage"].Clone();
             p.Path = p.Path.Replace("{packageId}", packageId);
 
             UpdatePackageDescriptorRequest req = new UpdatePackageDescriptorRequest();

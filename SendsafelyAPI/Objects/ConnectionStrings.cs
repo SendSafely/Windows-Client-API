@@ -32,7 +32,7 @@ namespace SendSafely.Objects
             {"deleteTempPackage", new Endpoint("/api/v2.0/package/{packageId}/temp/", HTTPMethod.DELETE, "application/json")},
             {"deletePackage", new Endpoint("/api/v2.0/package/{packageId}/", HTTPMethod.DELETE, "application/json")},
             {"packageInformation", new Endpoint("/api/v2.0/package/{packageId}/", HTTPMethod.GET, "application/json")},
-            {"updatePackageDescriptor", new Endpoint("/api/v2.0/package/{packageId}/", HTTPMethod.POST, "application/json")},
+            {"updatePackage", new Endpoint("/api/v2.0/package/{packageId}/", HTTPMethod.POST, "application/json")},
 
             {"directoryInformation", new Endpoint("/api/v2.0/package/{packageId}/directory/{directoryId}", HTTPMethod.GET, "application/json")},
             {"createDirectory", new Endpoint("/api/v2.0/package/{packageId}/directory/{directoryId}/subdirectory/", HTTPMethod.PUT, "application/json")},

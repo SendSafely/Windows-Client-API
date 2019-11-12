@@ -56,6 +56,10 @@ namespace SendSafely.Utilities
             {
                 throw new RegistrationNotAllowedException(response.Message);
             }
+            else if (response.Response == APIResponse.TWO_FA_ENFORCED)
+            {
+                throw new TwoFAEnforcedException(response.Message);
+            }
             else if (response.Response != APIResponse.SUCCESS)
             {
                 throw new ActionFailedException(response.Response.ToString(), response.Message);
