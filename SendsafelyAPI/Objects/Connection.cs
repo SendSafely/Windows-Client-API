@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using SendSafely.Exceptions;
 using System.Threading;
+using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace SendSafely.Objects
 {
@@ -203,6 +205,7 @@ namespace SendSafely.Objects
 
         private void Initialize(String host, String privateKey, String apiKey)
         {
+            this.SetTlsProtocol();
             this.apiKey = apiKey;
             this.privateKey = privateKey;
 
@@ -269,6 +272,32 @@ namespace SendSafely.Objects
             req.ContentLength = reqData.Length;
             Stream dataStream = req.GetRequestStream();
             dataStream.Write(reqData, 0, reqData.Length);
+        }
+
+        private void SetTlsProtocol()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var attributes = assembly.GetCustomAttributes(typeof(TargetFrameworkAttribute), false);
+            var version = (TargetFrameworkAttribute)attributes[0];
+
+            SecurityProtocolType flag;
+
+            try
+            {
+                if (Enum.TryParse("Tls11", out flag))
+                    ServicePointManager.SecurityProtocol |= flag;
+                if (Enum.TryParse("Tls12", out flag))
+                    ServicePointManager.SecurityProtocol |= flag;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Unable to set TLS protocol for " + version.FrameworkDisplayName + ", enabled protocols " + GetEnabledSecurityProtocols(), e);
+            }
+        }
+
+        private string GetEnabledSecurityProtocols()
+        {
+            return ServicePointManager.SecurityProtocol.ToString();
         }
 
         #endregion
