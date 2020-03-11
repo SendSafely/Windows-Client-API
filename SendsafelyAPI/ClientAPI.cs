@@ -696,6 +696,32 @@ namespace SendSafely
         }
 
         /// <summary>
+        /// Finalizes the package so it can be delivered to the recipients.
+        /// <seealso cref="CreatePackage()">createPackage()</seealso>. Additionally, the package must contain at least one file.
+        /// </summary>
+        /// <param name="packageId"> The unique package id of the package to be finalized.</param>
+        /// <param name="keycode"> The keycode belonging to the package.</param>
+        /// <param name="allowReplyAll"> Determines whether package recipients permitted to reply to all recipients or just sender.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+        /// <exception cref="PackageFinalizationException">Thrown when the package couldn't be finalized. The message will contain detailed information</exception>
+        /// <exception cref="MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        ///  A link to access the package. This link can be sent to the recipients.
+        /// </returns>
+        public String FinalizePackage(String packageId, String keycode, bool allowReplyAll)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.FinalizePackage(packageId, keycode, allowReplyAll);
+        }
+
+        /// <summary>
         /// Finalizes an undisclosed package, which is a package without recipients. Anyone with access to the link can access the package. 
         /// </summary>
         /// <param name="packageId"> The unique package id of the package to be finalized.</param>

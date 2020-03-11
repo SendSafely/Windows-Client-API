@@ -25,6 +25,8 @@ namespace SendSafely.Objects
         private String _label;
         private bool _isVDR;
         private List<ContactGroup> contactGroups;
+        private bool _allowReplyAll;
+        private String _packageParentId;
 
         [JsonProperty(PropertyName = "response")]
         internal APIResponse Response
@@ -151,5 +153,18 @@ namespace SendSafely.Objects
             set { state = value; }
         }
 
+        [JsonProperty(PropertyName = "allowReplyAll")]
+        public Boolean AllowReplyAll
+        {
+            get { return _allowReplyAll; }
+            set { _allowReplyAll = value; }
+        }
+
+        [JsonProperty(PropertyName = "packageParentId")]
+        public String PackageParentId
+        {
+            get { return _packageParentId; }
+            set { _packageParentId = value; }
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace SendSafely.Objects
         private String packageUserName;
         private String packageState;
         private List<String> contactGroups;
+        private String _packageParentId;
 
         [JsonProperty(PropertyName = "response")]
         internal APIResponse Response
@@ -124,6 +125,12 @@ namespace SendSafely.Objects
         {
             get { return contactGroups; }
             set { contactGroups = value; }
+        }
+        [JsonProperty(PropertyName = "packageParentId")]
+        public String PackageParentId
+        {
+            get { return _packageParentId; }
+            set { _packageParentId = value; }
         }
     }
 }

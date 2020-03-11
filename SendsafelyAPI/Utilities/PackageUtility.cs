@@ -576,6 +576,23 @@ namespace SendSafely
             return FinalizePackage(packageInfo);
         }
 
+        public String FinalizePackage(String packageId, String keycode, bool allowReplyAll)
+        {
+            if (packageId == null)
+            {
+                throw new InvalidPackageException("PackageId can not be null");
+            }
+            FinalizePackageRequest request = new FinalizePackageRequest();
+
+            request.AllowReplyAll = allowReplyAll;
+            // Add the keycode in case we don't have it
+            connection.AddKeycode(packageId, keycode);
+
+            // Get the updated package information.
+            PackageInformation packageInfo = GetPackageInformation(packageId);
+            return FinalizePackage(packageInfo, request);
+        }
+
         public String FinalizePackage(PackageInformation packageInfo)
         {
             FinalizePackageRequest request = new FinalizePackageRequest();
@@ -1325,6 +1342,7 @@ namespace SendSafely
             packageInfo.ServerSecret = raw.ServerSecret;
             packageInfo.Approvers = raw.Approvers;
             packageInfo.PackageTimestamp = raw.PackageUpdateTimestamp;
+            packageInfo.PackageParentId = raw.PackageParentId;
 
             packageInfo.PackageOwner = raw.PackageUserName;
             
@@ -1385,6 +1403,7 @@ namespace SendSafely
             packageInfo.ContactGroups = raw.ContactGroups;
             int stateValue = (int) Enum.Parse(typeof(PackageState), raw.State, true);
             packageInfo.Status = ConvertStateToStatus(stateValue);
+            packageInfo.PackageParentId = raw.PackageParentId;
 
             try
             {
