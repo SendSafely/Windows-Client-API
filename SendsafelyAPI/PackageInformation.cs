@@ -28,6 +28,8 @@ namespace SendSafely
         private String packageOwner;
         private List<Recipient> recipients;
         private List<ContactGroup> contactGroups;
+        private bool allowReplyAll;
+        private String packageParentId;
 
         /// <summary>
         /// The package ID for the given package.
@@ -185,6 +187,24 @@ namespace SendSafely
         {
             get { return contactGroups; }
             set { contactGroups = value; }
+        }
+
+        /// <summary>
+        /// Allow reply all, false if BCC recipients
+        /// </summary>
+        public Boolean AllowReplyAll
+        {
+            get { return allowReplyAll; }
+            set { allowReplyAll = value; }
+        }
+
+        /// <summary>
+        /// Package parent id
+        /// </summary>
+        public String PackageParentId
+        {
+            get { return packageParentId; }
+            set { packageParentId = value; }
         }
     }
 }

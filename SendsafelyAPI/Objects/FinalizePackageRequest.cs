@@ -10,7 +10,8 @@ namespace SendSafely.Objects
     {
         private String _password;
         private String _checksum;
-        private bool undisclosedRecipients; 
+        private bool undisclosedRecipients;
+        private bool allowReplyAll = false;
 
         [JsonProperty(PropertyName = "password")]
         public String Password { get; set; }
@@ -20,5 +21,8 @@ namespace SendSafely.Objects
 
         [JsonProperty(PropertyName = "undisclosedRecipients")]
         public bool UndisclosedRecipients { get; set; }
+
+        [JsonProperty(PropertyName = "allowReplyAll")]
+        public bool AllowReplyAll { get; set; }
     }
 }
