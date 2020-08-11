@@ -30,7 +30,7 @@ namespace SendSafely
 
         public PackageInformation CreatePackage(Boolean isWorkspace)
         {
-            return CreatePackage(true, String.Empty);
+            return CreatePackage(isWorkspace, String.Empty);
         }
 
 
