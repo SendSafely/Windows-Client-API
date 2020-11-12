@@ -15,25 +15,25 @@ namespace SendSafely.Objects
         private ICollection<DirectoryResponse> subDirectories = new Collection<DirectoryResponse>();
 
         [JsonProperty(PropertyName = "directoryId")]
-        internal String DirectoryId
+        public String DirectoryId
         {
             get { return directoryId; }
             set { directoryId = value; }
         }
         [JsonProperty(PropertyName = "name")]
-        internal String Name
+        public String Name
         {
             get { return name; }
             set { name = value; }
         }
         [JsonProperty(PropertyName = "created")]
-        internal DateTime Created
+        public DateTime Created
         {
             get { return created; }
             set { created = value; }
         }
         [JsonProperty(PropertyName = "subDirectories")]
-        internal ICollection<DirectoryResponse> SubDirectories
+        public ICollection<DirectoryResponse> SubDirectories
         {
             get { return subDirectories; }
             set { subDirectories = value; }

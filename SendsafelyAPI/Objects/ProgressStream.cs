@@ -25,7 +25,7 @@ namespace SendSafely.Objects
             this._inner = inner;
             this._progress = progress;
             this._prefix = prefix;
-            this._fileSize = size;
+            this._fileSize = size < 1024 ? size * 1024 : size; // multiple file size by 1024 if fileSize is less than 1024 bytes.
             this._readSoFar = 0;
             this._offset = offset;
             _lastProgressCallback = DateTime.Now.Ticks - UPDATE_FREQUENCY; // Make sure we trigger it the first time.

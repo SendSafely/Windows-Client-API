@@ -22,7 +22,7 @@ using Org.BouncyCastle.X509;
 
 namespace SendSafely.Utilities
 {
-    class CryptUtility
+    public class CryptUtility
     {
         public String GenerateToken()
         {

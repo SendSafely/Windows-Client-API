@@ -6,17 +6,10 @@ using Newtonsoft.Json;
 namespace SendSafely.Objects
 {
     [JsonObject(MemberSerialization.OptIn)]
-    class GetPackagesResponse
+    class GetPackagesResponse : PaginationResponse
     {
-        private APIResponse _response;
-        private List<PackageDTO> _packages;
 
-        [JsonProperty(PropertyName = "response")]
-        internal APIResponse Response
-        {
-            get { return _response; }
-            set { _response = value; }
-        }
+        private List<PackageDTO> _packages;
 
         [JsonProperty(PropertyName = "packages")]
         public List<PackageDTO> Packages
