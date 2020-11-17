@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace SendSafely.Objects
 {
-    class GetOrganizationPakagesResponse : StandardResponse
+    class GetOrganizationPakagesResponse : PaginationResponse
     {
 
         List<PackageDTO> packages;
@@ -18,13 +18,12 @@ namespace SendSafely.Objects
             set { packages = value; }
         }
 
+        [Obsolete("capped is deprecated, please use Pagination property instead)",false)]
         [JsonProperty(PropertyName = "capped")]
         public bool Capped
         {
             get { return capped; }
             set { capped = value; }
         }
-
-
     }
 }

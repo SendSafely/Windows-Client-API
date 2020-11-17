@@ -253,7 +253,7 @@ namespace SendSafely.Objects
 
         private String CreateSignature(String privateKey, String apiKey, String uri, String dateStr, String requestData)
         {
-            String content = apiKey + uri + dateStr + requestData;
+            String content = apiKey + uri.Split('?')[0] + dateStr + requestData;
             Logger.Log("-" + content + "-");
             CryptUtility cu = new CryptUtility();
             return cu.createSignature(privateKey, content);

@@ -15,6 +15,7 @@ namespace SendSafely.Objects
             {"receivedPackages", new Endpoint("/api/v2.0/package/received/", HTTPMethod.GET, "application/json")},
             {"archivedPackages", new Endpoint("/api/v2.0/package/archived/", HTTPMethod.GET, "application/json")},
             {"organizationPackages", new Endpoint("/api/v2.0/package/organization/", HTTPMethod.POST, "application/json")},
+            {"organizationPackagesSearch", new Endpoint("/api/v2.0/package/organization/search", HTTPMethod.POST, "application/json") },
             {"addRecipient", new Endpoint("/api/v2.0/package/{packageId}/recipient/", HTTPMethod.PUT, "application/json")},
             {"addRecipientPhonenumber", new Endpoint("/api/v2.0/package/{packageId}/recipient/{recipientId}/", HTTPMethod.POST, "application/json")},
             {"createFileId", new Endpoint("/api/v2.0/package/{packageId}/file/", HTTPMethod.PUT, "application/json")},
@@ -73,6 +74,7 @@ namespace SendSafely.Objects
             {"addContactGroupsToPackage", new Endpoint("/api/v2.0/package/{packageId}/group/{groupId}/", HTTPMethod.PUT, "application/json")},
             {"removeContactGroupsToPackage", new Endpoint("/api/v2.0/package/{packageId}/group/{groupId}/", HTTPMethod.DELETE, "application/json")},
             {"removeRecipient", new Endpoint("/api/v2.0/package/{packageId}/recipient/{recipientId}/", HTTPMethod.DELETE, "application/json")},
+            {"notifyRecipients", new Endpoint("/api/v2.0/package/{packageId}/notify", HTTPMethod.POST, "application/json") },
         };
     }
 }

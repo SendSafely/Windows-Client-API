@@ -39,6 +39,7 @@
     <Reference Include="BouncyCastle.Crypto">
       <HintPath>ThirdParty\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>ThirdParty\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -59,6 +60,9 @@
     <Compile Include="ISendSafelyProgress.cs" />
     <Compile Include="EnterpriseInformation.cs" />
     <Compile Include="Objects\CreatePackageRequest.cs" />
+    <Compile Include="Objects\PaginationResponse.cs" />
+    <Compile Include="PaginatedList.cs" />
+    <Compile Include="Objects\NotifyPackageRecipientsRequest.cs" />
     <Compile Include="PackageInformation.cs" />
     <Compile Include="Phonenumber.cs" />
     <Compile Include="PrivateKey.cs" />

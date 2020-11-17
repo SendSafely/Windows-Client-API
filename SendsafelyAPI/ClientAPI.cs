@@ -713,12 +713,40 @@ namespace SendSafely
         /// <returns>
         ///  A link to access the package. This link can be sent to the recipients.
         /// </returns>
+        [Obsolete("This version of FinalizePackage is deprecated. Instead please use FinalizePackage which supports both allowReplyAll and notifyRecipients features.")]
         public String FinalizePackage(String packageId, String keycode, bool allowReplyAll)
         {
             EnforceInitialized();
 
             PackageUtility pu = new PackageUtility(connection);
-            return pu.FinalizePackage(packageId, keycode, allowReplyAll);
+            return pu.FinalizePackage(packageId, keycode, false, allowReplyAll);
+        }
+
+        /// <summary>
+        /// Finalizes the package so it can be delivered to the recipients.
+        /// <seealso cref="CreatePackage()">createPackage()</seealso>. Additionally, the package must contain at least one file.
+        /// </summary>
+        /// <param name="packageId"> The unique package id of the package to be finalized.</param>
+        /// <param name="keycode"> The keycode belonging to the package.</param>
+        /// <param name="notifyRecipients">Determines whether package recipients are automatically notified.</param>
+        /// <param name="allowReplyAll"> Determines whether package recipients permitted to reply to all recipients or just sender.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the package limits has been exceeded.</exception>
+        /// <exception cref="PackageFinalizationException">Thrown when the package couldn't be finalized. The message will contain detailed information</exception>
+        /// <exception cref="MissingKeyCodeException">Thrown when the keycode is null, empty or to short.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        ///  A link to access the package. This link can be sent to the recipients.
+        /// </returns>
+        public String FinalizePackage(String packageId, String keycode, bool notifyRecipients, bool allowReplyAll)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.FinalizePackage(packageId, keycode, notifyRecipients, allowReplyAll);
         }
 
         /// <summary>
@@ -820,7 +848,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Get all active packages for the current user.
+        /// Get active packages for the current user. A maximum of 100 records is returned by this method.
         /// </summary>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
         /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
@@ -828,14 +856,36 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
         /// <returns>
-        /// A List containing package metadata for all active packages.
+        /// A List containing package metadata for active packages.
         /// </returns>
+        [Obsolete("GetActivePackages() is deprecated, please use GetActivePackages(rowIndex, pageSize) instead", false)]
         public List<PackageInformation> GetActivePackages()
         {
             EnforceInitialized();
 
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetActivePackages();
+        }
+
+        /// <summary>
+        /// Get a paginated set of active packages for the current user. A maximum pagesize of 100 records per method call is supported.
+        /// </summary>
+        /// <param name="rowIndex">The starting row index of the results to be returned.</param>
+        /// <param name="pageSize">The size of results to be returned.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// A PaginatedList containing package metadata for active packages.
+        /// </returns>
+        public PaginatedList<PackageInformation> GetActivePackages(int rowIndex, int pageSize)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetActivePackages(rowIndex, pageSize);
         }
 
         /// <summary>
@@ -853,15 +903,17 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Get all archived packages for the current user.
+        /// Gets archived packages for the current user. A maximum of 100 records is returned by this method.
         /// </summary>
+        /// <param name="rowIndex">The starting row index of the results to be returned.</param>
+        /// <param name="pageSize">The size of the results to be returned.</param>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
         /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
         /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
         /// <returns>
-        /// A List containing package metadata for all archived packages.
+        /// A List containing package metadata for archived packages.
         /// </returns>
         public List<PackageInformation> GetArchivedPackages()
         {
@@ -869,6 +921,28 @@ namespace SendSafely
 
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetArchivedPackages();
+        }
+
+        /// <summary>
+        /// Gets a paginated set of archived packages for the current user. A maximum pagesize of 100 records per method call is supported.
+        /// </summary>
+        /// <param name="rowIndex">The starting row index of the results to be returned.</param>
+        /// <param name="pageSize">The size of the results to be returned.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// A PaginatedList containing package metadata for archived packages.
+        /// </returns>
+        public PaginatedList<PackageInformation> GetArchivedPackages(int rowIndex, int pageSize)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+
+            return pu.GetArchivedPackages(rowIndex, pageSize);
         }
 
         /// <summary>
@@ -901,11 +975,44 @@ namespace SendSafely
         /// <param name="packageId">The unique package id of the package for the target directory.</param>
         /// <param name="directoryId">The unique directory id of the target directory. </param>
         /// <returns>A Directory object containing information about the directory.</returns>
+        [Obsolete("GetDirectory(packageId, directoryId) is deprecated, please use GetDirectory(packageId, directoryId, directoryIndex, fileIndex) or GetDirectory(packageId, directoryId, directoryIndex, fileIndex, sortField, sortOrder) instead", false)]
         public Directory GetDirectory(String packageId, String directoryId)
         {
             EnforceInitialized();
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetDirectory(packageId, directoryId);
+
+        }
+
+        /// <summary>
+        /// Retrieves meta data about a directory in a Workspace package.
+        /// </summary>
+        /// <param name="packageId">The unique package id of the package for the target directory.</param>
+        /// <param name="directoryId">The unique directory id of the target directory. </param>
+        /// <param name="directoryIndex">The index for paging subdirectories within the current directory.</param>
+        /// <param name="fileIndex">The index for paging files within the current directory.</param>
+        /// <returns>A Directory object containing information about the directory.</returns>
+        public Directory GetDirectory(String packageId, String directoryId, int directoryIndex, int fileIndex)
+        {
+            return this.GetDirectory(packageId, directoryId, directoryIndex, fileIndex, null, null);
+
+        }
+
+        /// <summary>
+        /// Retrieves meta data about a directory in a Workspace package.
+        /// </summary>
+        /// <param name="packageId">The unique package id of the package for the target directory.</param>
+        /// <param name="directoryId">The unique directory id of the target directory. </param>
+        /// <param name="fileIndex">The index for paging files within the current directory.</param>
+        /// <param name="directoryIndex">The index for paging subdirectories within the current directory.</param>
+        /// <param name="sortField">Field for sorting returned files and directories. Supported values are "name" to sort files and directories by name or "date" which sorts on fileUploaded for files and created for directories. The endpoint defaults to the "name" field.</param>
+        /// <param name="sortOrder">Order of the sorted field. Suppported values are "asc" or "desc" order. The endpoint defaults to the "asc" value.</param>
+        /// <returns>A Directory object containing information about the directory.</returns>
+        public Directory GetDirectory(String packageId, String directoryId, int directoryIndex, int fileIndex, String sortField, String sortOrder)
+        {
+            EnforceInitialized();
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetDirectory(packageId, directoryId, directoryIndex, fileIndex, sortField, sortOrder);
 
         }
 
@@ -1024,7 +1131,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Returns packages in the current user's organization based on provided search criteria. The search defaults to returning all packages up to the current date and time, if a specific value is not passed for each search criteria. A maximum of 100 records will be returned per method call. The calling user must be a SendSafely Enterprise Administrator.
+        /// Returns packages in the current user's organization based on provided search criteria. The search defaults to returning all packages up to the current date and time, if a specific value is not passed for each search criteria. A maximum of 100 records is returned by this method. The calling user must be a SendSafely Enterprise Administrator.
         /// </summary>
         /// <param name="fromDate">Date and time to search for packages with a package timestamp that is greater than or equal to the specified value. </param>
         /// <param name="toDate">Date and time to search for packages with a package timestamp that is less than or equal to the specified value. </param>
@@ -1033,12 +1140,33 @@ namespace SendSafely
         /// <param name="recipient">Email address to search for packages with a matching recipient email address. A valid email address must be provided.</param>
         /// <param name="fileName">Name of a file to search for packages with a matching file name.</param>
         /// <returns>A PackageSearchResults object</returns>
+        [Obsolete("GetOrganizationPackages is deprecated, please use GetOrganizationPackagesSearch instead", false)]
         public PackageSearchResults GetOrganizationPackages(DateTime? fromDate, DateTime? toDate, String sender, PackageStatus? status, String recipient, String fileName)
         {
             EnforceInitialized();
 
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetOrganizationPackages(fromDate, toDate, sender, status, recipient, fileName);
+        }
+
+        /// <summary>
+        /// Returns packages in the current user's organization based on provided search criteria. The search defaults to returning a paginated set of packages up to the current date and time, if a specific value is not passed for each search criteria. A maximum pagesize of 100 records per method call is supported. The calling user must be a SendSafely Enterprise Administrator.
+        /// </summary>
+        /// <param name="fromDate">Date and time to search for packages with a package timestamp that is greater than or equal to the specified value. </param>
+        /// <param name="toDate">Date and time to search for packages with a package timestamp that is less than or equal to the specified value. </param>
+        /// <param name="sender">Email address to search for packages with a matching package sender email address. A valid email address must be provided.</param>
+        /// <param name="status">PackageStatus enum value to search for packages with a matching package status.</param>
+        /// <param name="recipient">Email address to search for packages with a matching recipient email address. A valid email address must be provided.</param>
+        /// <param name="fileName">Name of a file to search for packages with a matching file name.</param>
+        /// <param name="rowIndex">Index of row to start retreiving for pagination.</param>
+        /// <param name="pageSize">The size of the results to be returned.</param>
+        /// <returns>A PaginatedList object containing PackageInformation items</returns>
+        public PaginatedList<PackageInformation> GetOrganizationPackagesSearch(DateTime? fromDate, DateTime? toDate, String sender, PackageStatus? status, String recipient, String fileName, int rowIndex, int pageSize)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetOrganizationPackagesSearch(fromDate, toDate, sender, status, recipient, fileName, rowIndex, pageSize);
         }
 
         /// <summary>
@@ -1151,7 +1279,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Retrieves a list of all active packages received for the given API User.
+        /// Retrieves a list of active packages received for the given API User. A maximum of 100 records is returned by this method.
         /// </summary>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
         /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
@@ -1159,14 +1287,36 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
         /// <returns>
-        /// A List containing package metadata for all received packages.
+        /// A List containing package metadata for received packages.
         /// </returns>
+        [Obsolete("GetReceivedPackages() is deprecated, please use GetReceivedPackages(rowIndex, pageSize) instead", false)]
         public List<PackageInformation> GetReceivedPackages()
         {
             EnforceInitialized();
 
             PackageUtility pu = new PackageUtility(connection);
             return pu.GetReceivedPackages();
+        }
+
+        /// <summary>
+        /// Retrieves a paginated set of active packages received for the given API User. A maximum pagesize of 100 records per method call is supported.
+        /// </summary>
+        /// <param name="rowIndex">The starting row index of the results to be returned.</param>
+        /// <param name="pageSize">The size of the results to be returned.</param>
+        /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
+        /// <exception cref="InvalidCredentialsException">Thrown when the API credentials are incorrect.</exception>
+        /// <exception cref="LimitExceededException">Thrown when the limits for the user has been exceeded.</exception>
+        /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
+        /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        /// <returns>
+        /// A PaginatedList containing package metadata for received packages.
+        /// </returns>
+        public PaginatedList<PackageInformation> GetReceivedPackages(int rowIndex, int pageSize)
+        {
+            EnforceInitialized();
+
+            PackageUtility pu = new PackageUtility(connection);
+            return pu.GetReceivedPackages(rowIndex, pageSize);
         }
 
         /// <summary>

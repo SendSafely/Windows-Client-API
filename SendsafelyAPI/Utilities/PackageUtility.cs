@@ -5,6 +5,7 @@ using SendSafely.Objects;
 using SendSafely.Exceptions;
 using SendSafely.Utilities;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace SendSafely
 {
@@ -30,7 +31,7 @@ namespace SendSafely
 
         public PackageInformation CreatePackage(Boolean isWorkspace)
         {
-            return CreatePackage(true, String.Empty);
+            return CreatePackage(isWorkspace, String.Empty);
         }
 
 
@@ -117,10 +118,26 @@ namespace SendSafely
 
         public List<PackageInformation> GetActivePackages()
         {
-            Endpoint p = ConnectionStrings.Endpoints["activePackages"].Clone();
-            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+            return GetActivePackages(-1, -1);
+        }
 
-            return Convert(response.Packages);
+        public PaginatedList<PackageInformation> GetActivePackages(int rowIndex, int pageSize)
+        {
+            Endpoint p = ConnectionStrings.Endpoints["activePackages"].Clone();
+            NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            if (rowIndex >= 0)
+            {
+                queryString.Add("rowIndex", rowIndex.ToString());
+            }
+           
+            if(pageSize >= 0)
+            {
+                queryString.Add("pageSize", pageSize.ToString());
+            }
+
+            p.Path = p.Path + "?" + queryString.ToString();
+            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+            return ProcessPagination(Convert(response.Packages), response);
         }
 
         public List<RecipientHistory> GetRecipientHistory(String recipientEmail)
@@ -146,18 +163,50 @@ namespace SendSafely
 
         public List<PackageInformation> GetReceivedPackages()
         {
+            return GetReceivedPackages(-1, -1);
+        }
+
+        public PaginatedList<PackageInformation> GetReceivedPackages(int rowIndex, int pageSize)
+        {
             Endpoint p = ConnectionStrings.Endpoints["receivedPackages"].Clone();
+            NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            if (rowIndex >= 0)
+            {
+                queryString.Add("rowIndex", rowIndex.ToString());
+            }
+            
+            if(pageSize >= 0)
+            {
+                queryString.Add("pageSize", pageSize.ToString());
+            }
+            p.Path = p.Path + "?" + queryString.ToString();            
             GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
-            return Convert(response.Packages);
+            return ProcessPagination(Convert(response.Packages), response);
         }
 
 
         public List<PackageInformation> GetArchivedPackages()
         {
-            Endpoint p = ConnectionStrings.Endpoints["archivedPackages"].Clone();
-            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+            return GetArchivedPackages(-1, -1);
+        }
 
-            return Convert(response.Packages);
+        public PaginatedList<PackageInformation> GetArchivedPackages(int rowIndex, int pageSize)
+        {
+            Endpoint p = ConnectionStrings.Endpoints["archivedPackages"].Clone();
+            NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+            if (rowIndex >= 0)
+            {
+                queryString.Add("rowIndex", rowIndex.ToString());
+            }
+            
+            if(pageSize >= 0)
+            {
+                queryString.Add("pageSize", pageSize.ToString());
+            }
+
+            p.Path = p.Path + "?" + queryString.ToString();            
+            GetPackagesResponse response = connection.Send<GetPackagesResponse>(p);
+            return ProcessPagination(Convert(response.Packages), response);
         }
 
         public PackageInformation GetPackageInformation(String packageId)
@@ -576,7 +625,7 @@ namespace SendSafely
             return FinalizePackage(packageInfo);
         }
 
-        public String FinalizePackage(String packageId, String keycode, bool allowReplyAll)
+        public String FinalizePackage(String packageId, String keycode, bool notifyRecipients, bool allowReplyAll)
         {
             if (packageId == null)
             {
@@ -590,13 +639,42 @@ namespace SendSafely
 
             // Get the updated package information.
             PackageInformation packageInfo = GetPackageInformation(packageId);
-            return FinalizePackage(packageInfo, request);
+            return FinalizePackage(packageInfo, request, notifyRecipients);
         }
 
         public String FinalizePackage(PackageInformation packageInfo)
         {
             FinalizePackageRequest request = new FinalizePackageRequest();
             return FinalizePackage(packageInfo, request);
+        }
+
+        public String FinalizePackage(PackageInformation packageInfo, FinalizePackageRequest request, Boolean notify)
+        {
+            try
+            {
+                String link = FinalizePackage(packageInfo, request);
+
+                if (notify)
+                {
+                    try
+                    {
+                        notifyPackageRecipients(packageInfo.PackageId, packageInfo.KeyCode);
+                        return link;
+                    }
+                    catch (ActionFailedException e)
+                    {
+                        String message = "Unable to notify package recipients. Server Error: " + e.Message + ", Finalized Package Link: " + link;
+                        throw new ActionFailedException(e.Reason, message);
+                    }
+                } else
+                {
+                    return link;
+                }
+                
+            } catch (PackageNeedsApprovalException pnae)
+            {
+                throw pnae;
+            }
         }
 
         public String FinalizePackage(PackageInformation packageInfo, FinalizePackageRequest request)
@@ -724,6 +802,19 @@ namespace SendSafely
             return response.Message + "#keyCode=" + packageInfo.KeyCode;
         }
 
+        public void notifyPackageRecipients(String packageId, String keycode)
+        {
+            NotifyPackageRecipientsRequest request = new NotifyPackageRecipientsRequest();
+            request.Keycode = keycode;
+            Endpoint p = ConnectionStrings.Endpoints["notifyRecipients"].Clone();
+            p.Path = p.Path.Replace("{packageId}", packageId);
+            StandardResponse response = connection.Send<StandardResponse>(p, request);
+
+            if(response.Response != APIResponse.SUCCESS)
+            {
+                throw new ActionFailedException(response.Response.ToString(),response.Message);
+            }
+        }
 
         public void DeleteTempPackage(String packageId)
         {
@@ -809,6 +900,11 @@ namespace SendSafely
 
         public Directory GetDirectory(String packageId, String directoryId)
         {
+            return GetDirectory(packageId, directoryId, 0, 0, null, null);
+        }
+
+        public Directory GetDirectory(String packageId, String directoryId, int directoryIndex, int fileIndex, String sortField, String sortOrder)
+        {
             if (packageId == null)
             {
                 throw new InvalidPackageException("Package ID can not be null");
@@ -818,9 +914,16 @@ namespace SendSafely
                 throw new InvalidPackageException("Directory ID can not be null");
             }
 
+            NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+         
             Endpoint p = ConnectionStrings.Endpoints["directoryInformation"].Clone();
             p.Path = p.Path.Replace("{packageId}", packageId);
             p.Path = p.Path.Replace("{directoryId}", directoryId);
+            queryString.Add("directoryIndex", directoryIndex.ToString());
+            queryString.Add("fileIndex", fileIndex.ToString());
+            queryString.Add("sortField", sortField);
+            queryString.Add("sortOrder", sortOrder);
+            p.Path = p.Path + "/?" + queryString.ToString();
             GetDirectoryResponse response = connection.Send<GetDirectoryResponse>(p);
 
             if (response.Response != APIResponse.SUCCESS)
@@ -1142,6 +1245,18 @@ namespace SendSafely
 
         internal PackageSearchResults GetOrganizationPackages(DateTime? fromDate, DateTime? toDate, string sender, PackageStatus? status, string recipient, string fileName)
         {
+            GetOrganizationPakagesResponse response = GetOrganizationPackagesSend(fromDate, toDate, sender, status, recipient, fileName, -1, -1);
+            return Convert(response);
+        }
+
+        internal PaginatedList<PackageInformation> GetOrganizationPackagesSearch(DateTime? fromDate, DateTime? toDate, string sender, PackageStatus? status, string recipient, string fileName, int rowIndex, int pageSize)
+        {
+            GetOrganizationPakagesResponse response = GetOrganizationPackagesSend(fromDate, toDate, sender, status, recipient, fileName, rowIndex, pageSize);
+            return ProcessPagination(Convert(response).Packages, response);
+        }
+
+        internal GetOrganizationPakagesResponse GetOrganizationPackagesSend(DateTime? fromDate, DateTime? toDate, string sender, PackageStatus? status, string recipient, string fileName, int rowIndex, int pageSize)
+        {
             GetOrganizationPackagesRequest request = new GetOrganizationPackagesRequest();
 
             if (fromDate != null)
@@ -1159,16 +1274,55 @@ namespace SendSafely
             request.Sender = sender;
             request.Recipient = recipient;
             request.Filename = fileName;
+            Endpoint p = ConnectionStrings.Endpoints["organizationPackagesSearch"].Clone();
+            NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
 
-            Endpoint p = ConnectionStrings.Endpoints["organizationPackages"].Clone();
+            if (rowIndex == -1 && pageSize == -1)
+            {
+                p = ConnectionStrings.Endpoints["organizationPackages"].Clone();
+            }
+            else
+            {
+                queryString.Add("rowIndex", rowIndex.ToString());
+                queryString.Add("pageSize", pageSize.ToString());
+                p.Path = p.Path + "?" + queryString.ToString();
+            }
+
             GetOrganizationPakagesResponse response = connection.Send<GetOrganizationPakagesResponse>(p, request);
-
             if (response.Response != APIResponse.SUCCESS)
             {
                 throw new ActionFailedException(response.Response.ToString(), response.Message);
             }
-             
-            return Convert(response);
+
+            return response;
+        }
+
+        private PaginatedList<PackageInformation> ProcessPagination(List<PackageInformation> packages, PaginationResponse response)
+        {
+            PaginatedList<PackageInformation> paginatedList = new PaginatedList<PackageInformation>();
+            paginatedList.AddRange(packages);
+
+            int rowIndex = 0, rowsReturned = 0, nextRowIndex = 0;
+            bool rowsCapped = false;
+
+            int.TryParse(response.Pagination["rowIndex"], out rowIndex);
+            paginatedList.RowIndex = rowIndex;
+            int.TryParse(response.Pagination["rowsReturned"], out rowsReturned);
+            paginatedList.RowsReturned = rowsReturned;
+            if (response.Pagination.ContainsKey("nextRowIndex"))
+            {
+                int.TryParse(response.Pagination["nextRowIndex"], out nextRowIndex);
+                paginatedList.NextRowIndex = nextRowIndex;
+            }
+
+            if (response.Pagination.ContainsKey("rowsCapped"))
+            {
+                bool.TryParse(response.Pagination["rowsCapped"], out rowsCapped);
+                paginatedList.RowsCapped = rowsCapped;
+            }
+
+            return paginatedList;
+
         }
 
         private PackageSearchResults Convert(GetOrganizationPakagesResponse response)
@@ -1300,10 +1454,8 @@ namespace SendSafely
             {
                 returnList.Add(Convert(raw));
             }
-
             return returnList;
-        }
-        
+        }        
 
         private Directory Convert(GetDirectoryResponse response)
         {
@@ -1345,7 +1497,15 @@ namespace SendSafely
             packageInfo.PackageParentId = raw.PackageParentId;
 
             packageInfo.PackageOwner = raw.PackageUserName;
-            
+            int stateValue;
+            if (!Int32.TryParse(raw.PackageState, out stateValue))
+            {
+                stateValue = 0;
+            }
+            packageInfo.Status = ConvertStateToStatus(stateValue);
+
+            packageInfo.State = stateValue.ToString() ;
+
             packageInfo.Files = new List<File>();
             foreach (String fileName in raw.Filenames)
             {
