@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <OutputPath>bin\Latest\</OutputPath>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SendSafely</RootNamespace>
     <AssemblyName>SendsafelyAPI</AssemblyName>
@@ -179,6 +180,9 @@
   <ItemGroup>
     <Folder Include="dll\" />
     <Folder Include="Enums\" />
+    <Content Include="LICENSE.txt">
+    		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
