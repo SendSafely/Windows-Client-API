@@ -15,6 +15,16 @@ namespace SendSafely
     public class ClientAPI
     {
         private Connection connection = null;
+        private String locale = "en-US";
+
+        public ClientAPI() { }
+
+        public ClientAPI(string locale)
+        {
+            if (!String.IsNullOrEmpty(locale)) {
+                this.locale = locale;
+            } 
+        }
 
         /// <summary>
         /// Initializes the API. This function must be called before the API can be used.
@@ -40,6 +50,7 @@ namespace SendSafely
         {
             StartupUtility su = new StartupUtility(host, apiSecret, apiKey, proxy);
             this.connection = su.GetConnectionObject();
+            this.connection.setLocale(this.locale);
         }
 
         /// <summary>
@@ -51,6 +62,7 @@ namespace SendSafely
         public void InitialSetup(string host, WebProxy proxy)
         {
             this.connection = new Connection(host, proxy);
+            this.connection.setLocale(this.locale);
         }
 
         /// <summary>
@@ -332,7 +344,7 @@ namespace SendSafely
         }
 
         /// <summary>
-        /// Deletes a temporary package, which is a package that has not yet been finalized. 
+        /// (Deprecated) Deletes a temporary package, which is a package that has not yet been finalized. 
         /// </summary>
         /// <param name="packageId"> The unique package id of the package to be deleted.</param>
         /// <exception cref="APINotInitializedException">Thrown when the API has not been initialized.</exception>
@@ -340,6 +352,7 @@ namespace SendSafely
         /// <exception cref="ServerUnavailableException">Thrown when the API failed to connect to the server.</exception>
         /// <exception cref="InvalidPackageException">Thrown when a non-existent or invalid package ID is used.</exception>
         /// <exception cref="ActionFailedException">Will be thrown if the server returns an error message</exception>
+        [Obsolete("This version of DeleteTempPackage is deprecated. Instead please use DeletePackage.")]
         public void DeleteTempPackage(String packageId)
         {
             EnforceInitialized();
@@ -713,7 +726,6 @@ namespace SendSafely
         /// <returns>
         ///  A link to access the package. This link can be sent to the recipients.
         /// </returns>
-        [Obsolete("This version of FinalizePackage is deprecated. Instead please use FinalizePackage which supports both allowReplyAll and notifyRecipients features.")]
         public String FinalizePackage(String packageId, String keycode, bool allowReplyAll)
         {
             EnforceInitialized();
@@ -1597,6 +1609,15 @@ namespace SendSafely
         public void SetOutlookVersion(String version)
         {
             this.connection.OutlookVersion = version;
+        }
+        
+        /// <summary>
+        /// This method is intended for use by the SendSafely Outlook Plugin. Sets the name of the client application that is making the API request.
+        /// </summary>
+        /// <param name="requestAPI">Name of client application making the API request.</param>
+        public void setRequestAPI(String requestAPI)
+        {
+            this.connection.RequestAPI = requestAPI;
         }
 
         /// <summary>

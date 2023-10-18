@@ -14,6 +14,7 @@ namespace SendSafely.Objects
         private bool _allowUndisclosedRecipients;
         private bool _outlookBeta;
         private bool _messageEncryption;
+        private bool _allowI18nAll;
 
         [JsonProperty(PropertyName = "host")]
         public String Host
@@ -48,6 +49,13 @@ namespace SendSafely.Objects
         {
             get { return _messageEncryption; }
             set { _messageEncryption = value; }
+        }
+
+        [JsonProperty(PropertyName = "allowI18nAll")]
+        public bool AllowI18nAll
+        {
+            get { return _allowI18nAll; }
+            set { _allowI18nAll = value; }
         }
     }
 }
