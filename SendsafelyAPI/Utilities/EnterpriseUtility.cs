@@ -32,6 +32,7 @@ namespace SendSafely.Utilities
             info.AllowUndisclosedRecipients = response.AllowUndisclosedRecipients;
             info.OutlookBeta = response.OutlookBeta;
             info.MessageEncryption = response.MessageEncryption;
+            info.AllowI18nAll = response.AllowI18nAll;
 
             return info;
         }

@@ -24,7 +24,11 @@ namespace SendSafely.Objects
         private String apiKeyHeadervalue = "ss-api-key";
         private String apiTimestampHeadervalue = "ss-request-timestamp";
         private String apiSignatureHeadervalue = "ss-request-signature";
+        private String acceptLanguageHeaderValue = "Accept-Language";
+        private String apiIntegrationTypeHeadervalue = "ss-request-api";
         private String outlookVersion = null;
+        private String requestAPI = null;
+        private String locale = "en-US";
 
         #region Constructors
 
@@ -53,6 +57,12 @@ namespace SendSafely.Objects
         {
             get { return outlookVersion; }
             set { outlookVersion = value; }
+        }
+
+        public String RequestAPI
+        {
+            get { return requestAPI; }
+            set { requestAPI = value; }
         }
 
         public String ApiHost
@@ -137,6 +147,7 @@ namespace SendSafely.Objects
 
             wrReq.Headers.Add(apiSignatureHeadervalue, signature);
             wrReq.Headers.Add(apiTimestampHeadervalue, dateStr);
+            wrReq.Headers.Add(acceptLanguageHeaderValue, locale);
 
             wrReq.Method = p.Method.ToString();
             wrReq.ContentType = p.ContentType + "; boundary=" + boundary;
@@ -182,6 +193,12 @@ namespace SendSafely.Objects
                 wrReq.Headers.Add(apiSignatureHeadervalue, signature);
             }
             wrReq.Headers.Add(apiTimestampHeadervalue, dateStr);
+            wrReq.Headers.Add(acceptLanguageHeaderValue, locale);
+
+            if (!String.IsNullOrEmpty(requestAPI))
+            {
+                wrReq.Headers.Add(apiIntegrationTypeHeadervalue, requestAPI);
+            }
 
             if (proxy != null)
             {
@@ -197,6 +214,11 @@ namespace SendSafely.Objects
             Stream objStream;
             objStream = wrReq.GetResponse().GetResponseStream();
             return objStream;
+        }
+
+        public void setLocale(String locale)
+        {
+            this.locale = locale;
         }
 
         #endregion

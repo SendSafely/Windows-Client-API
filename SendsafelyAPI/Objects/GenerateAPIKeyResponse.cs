@@ -14,6 +14,7 @@ namespace SendSafely.Objects
         private String _email;
 	    private String _apiKey;
 	    private String _apiSecret;
+        private String _twoFaType;
         
         [JsonProperty(PropertyName = "response")]
         internal APIResponse Response
@@ -48,6 +49,13 @@ namespace SendSafely.Objects
         {
             get { return _apiSecret; }
             set { _apiSecret = value; }
+        }
+
+        [JsonProperty(PropertyName = "twoFaType")]
+        public String TwoFaType
+        {
+            get { return _twoFaType; }
+            set { _twoFaType = value; }
         }
     }
 }
