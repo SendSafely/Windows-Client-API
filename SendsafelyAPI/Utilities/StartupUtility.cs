@@ -39,7 +39,7 @@ namespace SendSafely.Utilities
         public Objects.Version VerifyVersion()
         {
             Endpoint p = ConnectionStrings.Endpoints["version"].Clone();
-            String version = (ConfigurationManager.AppSettings["version"] != null) ? ConfigurationManager.AppSettings["version"] : "0.3";
+            String version = "0.3";
             p.Path = p.Path.Replace("{version}", version);
 
             VersionResponse response = connection.Send<VersionResponse>(p);

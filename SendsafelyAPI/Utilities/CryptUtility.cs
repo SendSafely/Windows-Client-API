@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Security.Cryptography;
 using System.IO;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Org.BouncyCastle.Bcpg;
 using SendSafely.Objects;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto.Digests;
-using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using SendSafely.Exceptions;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto.Prng;
-using Org.BouncyCastle.Asn1.Pkcs;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Bcpg.Sig;
 
 namespace SendSafely.Utilities
 {
@@ -299,10 +291,7 @@ namespace SendSafely.Utilities
 
         public Keypair GenerateKeyPair(String email)
         {
-            RsaKeyPairGenerator kpgen = new RsaKeyPairGenerator();
-            kpgen.Init(new KeyGenerationParameters(new SecureRandom(new CryptoApiRandomGenerator()), 2048));
-
-            AsymmetricCipherKeyPair keyPair = kpgen.GenerateKeyPair();
+            AsymmetricCipherKeyPair keyPair = generateAsymmetricCipherKeyPair();
             Keypair pair = Armor(keyPair, email);
 
             return pair;
@@ -316,28 +305,39 @@ namespace SendSafely.Utilities
             MemoryStream memOut = new MemoryStream();
             ArmoredOutputStream secretOut = new ArmoredOutputStream(memOut);
 
-            PgpSecretKey secretKey = new PgpSecretKey(
-                PgpSignature.DefaultCertification,
-                PublicKeyAlgorithmTag.RsaGeneral,
-                publicKey,
-                privateKey,
-                DateTime.Now,
-                email,
-                SymmetricKeyAlgorithmTag.Null,
-                null,
-                null,
-                null,
-                new SecureRandom()
-            );
+            AsymmetricCipherKeyPair subKeyPair = generateAsymmetricCipherKeyPair();
+            PgpSignatureSubpacketGenerator subPackets = new PgpSignatureSubpacketGenerator();
+            subPackets.SetKeyFlags(false,KeyFlags.Authentication | KeyFlags.CertifyOther | KeyFlags.SignData);
+            subPackets.SetKeyExpirationTime(false, 0);
 
+            PgpKeyPair pgpMasterKey = new PgpKeyPair(PublicKeyAlgorithmTag.RsaGeneral, publicKey, privateKey, DateTime.Now);
+            PgpKeyPair pgpSubKey = new PgpKeyPair(PublicKeyAlgorithmTag.RsaGeneral, subKeyPair.Public, subKeyPair.Private, DateTime.Now);
+            
+            PgpKeyRingGenerator pgpGenerator = new PgpKeyRingGenerator(
+                PgpSignature.DefaultCertification,
+                pgpMasterKey, 
+                email, 
+                SymmetricKeyAlgorithmTag.Null,
+                new char[0],
+                false,
+                subPackets.Generate(),
+                null,
+                new SecureRandom());
+
+            subPackets = new PgpSignatureSubpacketGenerator();
+            subPackets.SetKeyExpirationTime(false, 0);
+            subPackets.SetKeyFlags(false, KeyFlags.EncryptStorage | KeyFlags.EncryptComms);
+            pgpGenerator.AddSubKey(pgpSubKey, subPackets.Generate(), null);
+
+            PgpSecretKeyRing secretKey = pgpGenerator.GenerateSecretKeyRing();
+            PgpPublicKeyRing key = pgpGenerator.GeneratePublicKeyRing();
+            
             secretKey.Encode(secretOut);
             secretOut.Close();
 
             MemoryStream memPublicOut = new MemoryStream();
             Stream publicOut = new ArmoredOutputStream(memPublicOut);
-
-            PgpPublicKey key = secretKey.PublicKey;
-
+            
             key.Encode(publicOut);
 
             publicOut.Close();
@@ -350,6 +350,14 @@ namespace SendSafely.Utilities
             pair.PublicKey = publicKeyStr;
 
             return pair;
+        }
+
+        private AsymmetricCipherKeyPair generateAsymmetricCipherKeyPair()
+        {
+            RsaKeyPairGenerator kpgen = new RsaKeyPairGenerator();
+            kpgen.Init(new KeyGenerationParameters(new SecureRandom(new CryptoApiRandomGenerator()), 2048));
+            AsymmetricCipherKeyPair keyPair = kpgen.GenerateKeyPair();
+            return keyPair;
         }
 
         public String pbkdf2(String value, String salt, int iterations)

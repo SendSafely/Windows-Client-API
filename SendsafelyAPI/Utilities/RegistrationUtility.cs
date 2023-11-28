@@ -222,7 +222,7 @@ namespace SendSafely.Utilities
 
             if (response.Response == APIResponse.TWO_FA_REQUIRED)
             {
-                throw new TwoFactorAuthException(response.Message);
+                throw new TwoFactorAuthException(response.Message, response.TwoFaType);
             }
             else if (response.Response == APIResponse.AUTHENTICATION_FAILED)
             {
