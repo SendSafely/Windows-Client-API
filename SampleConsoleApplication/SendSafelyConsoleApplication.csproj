@@ -36,9 +36,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SendsafelyAPI, Version=1.1.0.2, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\SendsafelyAPI\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SendsafelyAPI, Version=3.0.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SendsafelyAPI\bin\Debug\SendsafelyAPI.dll</HintPath>
+      <HintPath>..\SendsafelyAPI\SendsafelyAPI\bin\Debug\SendsafelyAPI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,13 +56,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SendsafelyAPI\SendsafelyAPI.csproj">
+    <ProjectReference Include="..\SendsafelyAPI\SendsafelyAPI\SendsafelyAPI.csproj">
       <Project>{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}</Project>
       <Name>SendsafelyAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
