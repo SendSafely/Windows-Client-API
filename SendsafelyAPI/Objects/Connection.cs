@@ -239,23 +239,24 @@ namespace SendSafely.Objects
 
         private String SendRequest(Endpoint p, Object request)
         {
-            Stream objStream = CallServer(p, request);
-
-            StreamReader objReader = new StreamReader(objStream);
-
-            String sLine = "";
-            String response = "";
-            while (sLine != null)
+            using (var objStream = CallServer(p, request))
             {
-                sLine = objReader.ReadLine();
-                if (sLine != null)
-                {
-                    response += sLine;
-                    Logger.Log(sLine);
-                }
-            }
+                StreamReader objReader = new StreamReader(objStream);
 
-            return response;
+                String sLine = "";
+                String response = "";
+                while (sLine != null)
+                {
+                    sLine = objReader.ReadLine();
+                    if (sLine != null)
+                    {
+                        response += sLine;
+                        Logger.Log(sLine);
+                    }
+                }
+
+                return response;
+            }
         }
 
         private String generateUserAgent()
@@ -292,8 +293,10 @@ namespace SendSafely.Objects
             byte[] reqData = System.Text.Encoding.UTF8.GetBytes(requestString);
 
             req.ContentLength = reqData.Length;
-            Stream dataStream = req.GetRequestStream();
-            dataStream.Write(reqData, 0, reqData.Length);
+
+            using (var dataStream = req.GetRequestStream()) {
+                dataStream.Write(reqData, 0, reqData.Length);
+            }
         }
 
         private void SetTlsProtocol()

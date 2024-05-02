@@ -30,7 +30,7 @@ namespace SendSafely.Utilities
             using (FileStream outStream = encryptedFile.OpenWrite())
             {
                 PgpEncryptedDataGenerator cPk = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Aes256, true);
-                cPk.AddMethod(passPhrase);
+                cPk.AddMethod(passPhrase,HashAlgorithmTag.Sha256);
                 using (Stream cOut = cPk.Open(outStream, new byte[1 << 16]))
                 {
                     WriteFileToLiteralData(cOut, PgpLiteralData.Binary, inputFile, filename, inputFile.Length);
@@ -157,7 +157,7 @@ namespace SendSafely.Utilities
             lData.Close();
 	
             PgpEncryptedDataGenerator cPk = new PgpEncryptedDataGenerator(SymmetricKeyAlgorithmTag.Aes256, true);
-            cPk.AddMethod(passPhrase);
+            cPk.AddMethod(passPhrase, HashAlgorithmTag.Sha256);
 	        
 	        byte[] bytes = bOut.ToArray();
 
@@ -307,7 +307,7 @@ namespace SendSafely.Utilities
 
             AsymmetricCipherKeyPair subKeyPair = generateAsymmetricCipherKeyPair();
             PgpSignatureSubpacketGenerator subPackets = new PgpSignatureSubpacketGenerator();
-            subPackets.SetKeyFlags(false,KeyFlags.Authentication | KeyFlags.CertifyOther | KeyFlags.SignData);
+            subPackets.SetKeyFlags(false,KeyFlags.CertifyOther | KeyFlags.SignData);
             subPackets.SetKeyExpirationTime(false, 0);
 
             PgpKeyPair pgpMasterKey = new PgpKeyPair(PublicKeyAlgorithmTag.RsaGeneral, publicKey, privateKey, DateTime.Now);
