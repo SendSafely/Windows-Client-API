@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Text;
 using System.Security.Cryptography;
 using System.IO;
@@ -173,6 +174,25 @@ namespace SendSafely.Utilities
             return Convert.ToBase64String(encOut.ToArray());
         }
 
+        private Boolean CanEncrypt(IEnumerable keySigs) {
+            int keyFlags = 0;
+
+            foreach(PgpSignature ks in keySigs)
+            {
+                PgpSignatureSubpacketVector ssv = ks.GetHashedSubPackets();
+
+                if(ssv != null)
+                {
+                    keyFlags += ks.GetHashedSubPackets().GetKeyFlags();
+                }
+            }
+
+            Boolean isEncryptCommunication = (keyFlags & PgpKeyFlags.CanEncryptCommunications) == PgpKeyFlags.CanEncryptCommunications;
+            Boolean isEncryptStorage = (keyFlags & PgpKeyFlags.CanEncryptStorage) == PgpKeyFlags.CanEncryptStorage;
+
+            return isEncryptCommunication || isEncryptStorage;
+        }
+        
         public String EncryptKeycode(String publicKeyStr, String unencryptedKeycode)
         {
             byte[] unencryptedByteArray = System.Text.Encoding.ASCII.GetBytes (unencryptedKeycode);
