@@ -174,7 +174,7 @@ namespace SendSafely.Utilities
             return Convert.ToBase64String(encOut.ToArray());
         }
 
-        private Boolean CanEncrypt(IEnumerable keySigs) {
+        public Boolean CanEncrypt(IEnumerable keySigs) {
             int keyFlags = 0;
 
             foreach(PgpSignature ks in keySigs)
