@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendsafelyAPI", "SendsafelyAPI\SendsafelyAPI.csproj", "{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendsafelyAPI", "SendsafelyAPI\SendsafelyAPI.csproj", "{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
