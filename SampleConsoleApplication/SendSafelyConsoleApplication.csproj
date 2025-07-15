@@ -43,7 +43,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SendsafelyAPI, Version=4.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SendsafelyAPI, Version=4.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SendsafelyAPI\packages\SendsafelyAPI.dll</HintPath>
     </Reference>

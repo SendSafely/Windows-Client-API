@@ -206,14 +206,26 @@ namespace SendSafely.Utilities
             {
                 foreach(PgpPublicKey publicKey in pgpPub.GetPublicKeys())
                 {
-                    if (publicKey.IsEncryptionKey)
+                    if (publicKey.IsEncryptionKey && CanEncrypt(publicKey.GetSignatures()))
                     {
                         key = publicKey;
                         break;
                     }
                 }
             }
-
+            if (key == null) {
+                foreach (PgpPublicKeyRing pgpPub in pubRings.GetKeyRings())
+                {
+                    foreach(PgpPublicKey publicKey in pgpPub.GetPublicKeys())
+                    {
+                        if (publicKey.IsEncryptionKey)
+                        {
+                            key = publicKey;
+                            break;
+                        }
+                    }
+                }
+            }
             if (key == null)
             {
                 throw new SendSafely.Exceptions.InvalidKeyException("Can't find encryption key in key ring.");

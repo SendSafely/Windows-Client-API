@@ -4,8 +4,8 @@
     <AssemblyTitle>SendSafely Windows Client API</AssemblyTitle>
     <Product>SendSafely Windows Client API</Product>
     <Copyright>Copyright ©  2024</Copyright>
-    <AssemblyVersion>4.0.0</AssemblyVersion>
-    <FileVersion>4.0.0</FileVersion>
+    <AssemblyVersion>4.0.1</AssemblyVersion>
+    <FileVersion>4.0.1</FileVersion>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <PropertyGroup>
@@ -22,7 +22,7 @@
 	<FileAlignment>512</FileAlignment>
 	<TargetFrameworkProfile />
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-	<Version>4.0.0</Version>
+	<Version>4.0.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 	<DebugSymbols>true</DebugSymbols>
