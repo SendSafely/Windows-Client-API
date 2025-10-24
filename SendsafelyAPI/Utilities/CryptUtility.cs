@@ -15,6 +15,12 @@ using Org.BouncyCastle.Bcpg.Sig;
 
 namespace SendSafely.Utilities
 {
+    public enum KeySize
+    {
+        SIZE_2048 = 2048,
+        SIZE_4096 = 4096
+    }
+
     public class CryptUtility
     {
         public String GenerateToken()
@@ -323,13 +329,22 @@ namespace SendSafely.Utilities
 
         public Keypair GenerateKeyPair(String email)
         {
-            AsymmetricCipherKeyPair keyPair = generateAsymmetricCipherKeyPair();
-            Keypair pair = Armor(keyPair, email);
+            AsymmetricCipherKeyPair keyPair = generateAsymmetricCipherKeyPair(2048);
+            Keypair pair = Armor(keyPair, email, 2048);
+
+            return pair;
+        }
+        
+        public Keypair GenerateKeyPair(String email, KeySize keySize)
+        {
+            int keySizeVal = (int)keySize;
+            AsymmetricCipherKeyPair keyPair = generateAsymmetricCipherKeyPair(keySizeVal);
+            Keypair pair = Armor(keyPair, email, keySizeVal);
 
             return pair;
         }
 
-        private Keypair Armor(AsymmetricCipherKeyPair keyPair, String email)
+        private Keypair Armor(AsymmetricCipherKeyPair keyPair, String email, int keySize)
         {
             AsymmetricKeyParameter privateKey = keyPair.Private;
             AsymmetricKeyParameter publicKey = keyPair.Public;
@@ -337,7 +352,7 @@ namespace SendSafely.Utilities
             MemoryStream memOut = new MemoryStream();
             ArmoredOutputStream secretOut = new ArmoredOutputStream(memOut);
 
-            AsymmetricCipherKeyPair subKeyPair = generateAsymmetricCipherKeyPair();
+            AsymmetricCipherKeyPair subKeyPair = generateAsymmetricCipherKeyPair(keySize);
             PgpSignatureSubpacketGenerator subPackets = new PgpSignatureSubpacketGenerator();
             subPackets.SetKeyFlags(false,KeyFlags.CertifyOther | KeyFlags.SignData);
             subPackets.SetKeyExpirationTime(false, 0);
@@ -384,10 +399,10 @@ namespace SendSafely.Utilities
             return pair;
         }
 
-        private AsymmetricCipherKeyPair generateAsymmetricCipherKeyPair()
+        private AsymmetricCipherKeyPair generateAsymmetricCipherKeyPair(int keySize)
         {
             RsaKeyPairGenerator kpgen = new RsaKeyPairGenerator();
-            kpgen.Init(new KeyGenerationParameters(new SecureRandom(new CryptoApiRandomGenerator()), 2048));
+            kpgen.Init(new KeyGenerationParameters(new SecureRandom(new CryptoApiRandomGenerator()), keySize));
             AsymmetricCipherKeyPair keyPair = kpgen.GenerateKeyPair();
             return keyPair;
         }
