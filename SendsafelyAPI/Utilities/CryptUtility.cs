@@ -193,6 +193,7 @@ namespace SendSafely.Utilities
                 }
             }
 
+            // we verify if public key has Encrypt flag turned on
             Boolean isEncryptCommunication = (keyFlags & PgpKeyFlags.CanEncryptCommunications) == PgpKeyFlags.CanEncryptCommunications;
             Boolean isEncryptStorage = (keyFlags & PgpKeyFlags.CanEncryptStorage) == PgpKeyFlags.CanEncryptStorage;
 
@@ -219,6 +220,8 @@ namespace SendSafely.Utilities
                     }
                 }
             }
+            // if no encrypt key was found then see if we can use the signing key.
+            // this is only to provide legacy support for incorrectly formatted keys that don't have an encryption key.
             if (key == null) {
                 foreach (PgpPublicKeyRing pgpPub in pubRings.GetKeyRings())
                 {
@@ -232,6 +235,7 @@ namespace SendSafely.Utilities
                     }
                 }
             }
+            // if the key is still null then throw an exception
             if (key == null)
             {
                 throw new SendSafely.Exceptions.InvalidKeyException("Can't find encryption key in key ring.");
